@@ -10,7 +10,10 @@ module.exports = function (app, appEnv) {
     });
   app.route('/login')
       .get(function (req, res) {
-        res.render(appEnv.path + '/app/views/login.pug');
+        let out = {
+          message: req.flash('loginMessage')
+        };
+        res.render(appEnv.path + '/app/views/login.pug', out);
       })
       .post(appEnv.passport.authenticate('local-login', {
         successRedirect : '/',
@@ -19,7 +22,10 @@ module.exports = function (app, appEnv) {
       }));
   app.route('/signup')
       .get(function(req, res) {
-        res.render(appEnv.path + '/app/views/signup.pug');
+        let out = {
+          message: req.flash('signupMessage')
+        };
+        res.render(appEnv.path + '/app/views/signup.pug', out);
       })
       .post(appEnv.passport.authenticate('local-signup', {
             successRedirect: '/',

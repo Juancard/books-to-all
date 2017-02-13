@@ -30,7 +30,7 @@ body {
 }
 
 .myContent {
-  padding-bottom:80px;   /* Height of the footer */
+  padding-bottom:100px;   /* Height of the footer */
 }
 
 header {
@@ -54,7 +54,7 @@ header span {
 .features li:before {
   content: '✔';
   color: rgb(67, 140, 185);
-  margin-left: -1em; margin-right: .300em;
+  margin-left: 0em; margin-right: .300em;
 }
 .features li {
   font-size: 1.75em;

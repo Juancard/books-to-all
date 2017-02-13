@@ -18,7 +18,7 @@ module.exports = function (passport) {
   // LOCAL SIGNUP ============================================================
   // =========================================================================
   passport.use("local-signup", new LocalStrategy({
-      usernameField : 'username',
+      usernameField : 'email',
       passwordField : 'password',
       passReqToCallback : true // allows us to pass back the entire request to the callback
   },
@@ -28,7 +28,8 @@ module.exports = function (passport) {
     process.nextTick(function() {
       // find a user whose email is the same as the forms email
       // we are checking to see if the user trying to login already exists
-      User.findOne({ 'local.email' :  email }, function(err, user) {
+			console.log("en local signup passport");
+			User.findOne({ 'local.email' :  email }, function(err, user) {
 	      // if there are any errors, return the error
 	      if (err) return done(err);
 	      // check to see if theres already a user with that email
@@ -39,8 +40,7 @@ module.exports = function (passport) {
 					req.body.displayName, email, password);
           // save the user
           newUser.save(function(err) {
-              if (err)
-                  throw err;
+              if (err) throw err;
               return done(null, newUser);
           });
         }
