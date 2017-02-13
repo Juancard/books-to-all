@@ -30,12 +30,46 @@ body {
 }
 
 .myContent {
-   padding-bottom:80px;   /* Height of the footer */
+  padding-bottom:80px;   /* Height of the footer */
 }
 
 header {
 	text-align: center;
-	padding: 0;
+	padding: 30px;
+  background-color: rgb(67, 140, 185);
+  color: white;
+}
+header h1 {
+  font-family: Book Antiqua,Palatino,Palatino Linotype,Palatino LT STD,Georgia,serif;
+  font-size: 5em;
+}
+header span {
+  margin-top: 10px;
+  font-size: 5em;
+}
+.navbar {
+  margin-bottom: 0px !important;
+}
+
+.features li:before {
+  content: '✔';
+  color: green;
+  margin-left: -1em; margin-right: .300em;
+}
+.features li {
+  font-size: 1.75em;
+  font-family: Book Antiqua,Palatino,Palatino Linotype,Palatino LT STD,Georgia,serif;
+  margin: 5px;
+}
+.features ul {
+  padding-left:20px;
+  text-indent:2px;
+  list-style: none;
+  list-style-position:outside;
+  margin: 20px;
+}
+.features {
+  margin: 20px;
 }
 /**************************
   ARTICLE
