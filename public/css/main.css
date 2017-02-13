@@ -47,10 +47,11 @@ header span {
   margin-top: 10px;
   font-size: 5em;
 }
+/*
 .navbar {
   margin-bottom: 0px !important;
 }
-
+*/
 .features li:before {
   content: '✔';
   color: rgb(67, 140, 185);
