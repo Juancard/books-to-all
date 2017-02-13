@@ -2,18 +2,15 @@ extends skeleton.pug
 
 block content
   .container
-    .row.col-md-offset-3.col-md-6.text-primary
-      h1.text-primary
-        span.fa.fa-sign-in
-        |  Signup
+    .row.col-md-offset-3.col-md-6.text-success
+      h1
+        span.glyphicon.glyphicon-log-in
+        |  Login
       hr
       // LOGIN FORM
-      form(name="signupForm", action='/signup', method='post')
+      form(name="loginForm", action='/login', method='post')
         if (message && message.length > 0)
           p#alert-message.alert.alert-danger #{message}
-        .form-group
-          label(for="displayName") Complete name
-          input.form-control(type='text', name='displayName', autofocus='true', tabindex='1', required)
         .form-group
           label(for="email") Email
           input.form-control(type='text', name='email', tabindex='2', required)
@@ -21,5 +18,5 @@ block content
           label(for="password") Password
           input.form-control(type='password', name='password', tabindex='3', required)
         hr
-        button.btn.btn-primary.btn-lg.btn-block(type='submit', tabindex='4')
-          span.fa.fa-sign-in
+        button.btn.btn-success.btn-lg.btn-block(type='submit', tabindex='4')
+          span.glyphicon.glyphicon-log-in
