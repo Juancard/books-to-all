@@ -53,7 +53,7 @@ header span {
 
 .features li:before {
   content: '✔';
-  color: green;
+  color: rgb(67, 140, 185);
   margin-left: -1em; margin-right: .300em;
 }
 .features li {
@@ -70,19 +70,6 @@ header span {
 }
 .features {
   margin: 20px;
-}
-/**************************
-  ARTICLE
-****************************/
-
-article {
-  padding-top: 1px;
-  padding-bottom: 20px;
-  padding-left: 10px;
-  padding-right: 0px;
-  margin-bottom:10px;
-  border-left-style: solid;
-  background-color: #efefef;
 }
 
 /**************************
