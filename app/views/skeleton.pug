@@ -23,11 +23,12 @@ block html
         script(src='https://raw.github.com/HubSpot/pace/v1.0.2/pace.min.js')
     block body
       body
-        block navbar
-          include navbar.pug
-        .myContent.container-fluid
-          block content
-        block footer
-          include footer.pug
+        .container-fluid
+          block navbar
+            include navbar.pug
+          .myContent
+            block content
+          block footer
+            include footer.pug
         block js
           script(type='text/javascript', src='/common/ajax-functions.js')
