@@ -1,16 +1,18 @@
 'use strict';
 
-var express = require('express');
-var routes = require('./app/routes/index.js');
-var mongoose = require('mongoose');
-var passport = require('passport');
-var session = require('express-session');
-var logger = require("morgan");
-var cookieParser = require('cookie-parser');
-var bodyParser   = require('body-parser');
-var flash = require('connect-flash');
+let express = require('express');
+let routes = require('./app/routes/index.js');
+let mongoose = require('mongoose');
+let passport = require('passport');
+let session = require('express-session');
+let logger = require("morgan");
+let cookieParser = require('cookie-parser');
+let bodyParser   = require('body-parser');
+let flash = require('connect-flash');
+let errors = require('http-verror');
+let errorhandler = require('errorhandler');
 
-var app = express();
+let app = express();
 require('dotenv').load();
 require('./app/config/passport')(passport);
 
@@ -53,40 +55,24 @@ app.use(function(req, res, next) {
 });
 
 // Data to send to Routes files
-var appEnv = {
+let appEnv = {
   path: process.cwd(),
   middleware: {
     isLoggedIn: require("./middleware/isLoggedIn.js")
   },
-  passport: passport
+  passport,
+	errors,
 }
 
 routes(app, appEnv);
 
-if (app.get('env') === 'development') {
-
-  app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-    res.render(process.cwd() + '/app/views/error.pug', {
-        message: err.message,
-				status: err.status || 500,
-        error: err
-    });
-  });
-
+if (process.env.NODE_ENV == 'development'){
+	app.use(errorhandler());
+} else {
+	app.use(require("./middleware/myErrorHandler.js"));
 }
-// production error handler
-// no stacktraces leaked to user
-app.use(function(err, req, res, next) {
-    res.status(err.status || 500);
-		res.render(process.cwd() + '/app/views/error.pug', {
-        message: err.message,
-				status: err.status || 500,
-        error: {}
-    });
-});
 
-var port = process.env.PORT || 8080;
+let port = process.env.PORT || 8080;
 app.listen(port,  function () {
 	console.log('Node.js listening on port ' + port + '...');
 });

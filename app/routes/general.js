@@ -9,14 +9,13 @@ module.exports = function (app, appEnv) {
 
   app.route('/')
     .get(function (req, res) {
+      throw new Error("puto")
       res.render(appEnv.path + '/app/views/index.pug');
     });
 
   app.route('*')
     .get(function(req, res, next){
-      let error = new Error("The requested page does not exist");
-      error.status = 404;
-      next(error);
+      next(new appEnv.errors.NotFound());
     });
 
 }

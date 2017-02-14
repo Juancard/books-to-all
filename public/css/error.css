@@ -1,0 +1,12 @@
+
+.error-template {
+  margin-top:20px
+}
+.error-actions .btn {
+  margin-right:10px;
+  margin-bottom:10px;
+}
+.error-template .error-icon {
+  color: #d9534f;
+  font-size: 10em;
+}

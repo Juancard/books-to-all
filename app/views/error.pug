@@ -1,0 +1,37 @@
+extends skeleton.pug
+
+block append css
+  link(href='/public/css/error.css', rel='stylesheet', type='text/css')
+
+block content
+  .col-md-8.col-md-offset-2
+    .error-template.text-center
+      span.error-icon.fa.fa-exclamation-circle
+      h2.text-danger Error #{error.statusCode || 500}: #{error.name}
+      h4.text-danger #{error.message}
+      if (developer)
+        button#btn-spoiler.btn.btn-warning
+          span.glyphicon.glyphicon-eye-open
+          |  See full stack
+      hr
+    code#stack(hidden='').text-justify #{error.stack}
+      hr
+    .error-actions.text-center
+      a.btn.btn-primary(href='/')
+        span.glyphicon.glyphicon-home
+        |  Take Me Home
+      a.btn.btn-default(href="mailto:juancruz.23@hotmail.com?subject="+error)
+        span.glyphicon.glyphicon-envelope
+        |  Contact Support
+block append js
+  script.
+    'use strict';
+
+    (function () {
+      let btnSpoiler = document.getElementById('btn-spoiler');
+      let stackElement = document.getElementById('stack');
+      btnSpoiler.addEventListener('click', (event) => {
+        stackElement.hidden = !stackElement.hidden;
+          //if.style.display=='none') {document.getElementById('spoiler') .style.display=''}else{document.getElementById('spoiler') .style.display='none'}
+      });
+    })();
