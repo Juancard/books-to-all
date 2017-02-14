@@ -3,13 +3,13 @@
 module.exports = function (app, appEnv) {
 
   app.route('/mybooks')
-    .get(appEnv.middleware.isLoggedIn, function (req, res) {
-      res.json({message: 'in mybooks page'});
+    .get(appEnv.middleware.isLoggedIn, (req, res, next) => {
+      next(new appEnv.errors.NotImplemented());
     });
 
   app.route('/allbooks')
-    .get(appEnv.middleware.isLoggedIn, function (req, res) {
-      res.json({message: 'in allbooks page'});
+    .get(appEnv.middleware.isLoggedIn, (req, res, next) => {
+      next(new appEnv.errors.NotImplemented());
     });
 
 }

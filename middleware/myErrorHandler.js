@@ -6,5 +6,9 @@ module.exports = (err, req, res, next) => {
     error: err,
     developer: process.env.NODE_ENV
   }
-  res.render(process.cwd() + '/app/views/error.pug', out);
+  if (req.xhr) {
+    res.json(out)
+  }else {
+    res.render(process.cwd() + '/app/views/error.pug', out);
+  }
 }

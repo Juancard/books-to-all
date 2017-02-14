@@ -17,12 +17,21 @@ var ajaxFunctions = {
       var xmlhttp = new XMLHttpRequest();
 
       xmlhttp.onreadystatechange = function () {
-         if (xmlhttp.readyState === 4 && xmlhttp.status === 200) {
+        if (xmlhttp.readyState === 4) {
+          if (xmlhttp.status === 200) {
             callback(xmlhttp.response);
-         }
+          } else {
+            callback({
+              error: true,
+              message: xmlhttp.statusText,
+              status: xmlhttp.status
+            });
+          }
+        }
       };
 
       xmlhttp.open(method, url, true);
+      xmlhttp.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
       if (data) {
         xmlhttp.setRequestHeader("Content-Type", "application/json");
         xmlhttp.send(JSON.stringify(data));

@@ -10,7 +10,8 @@ let cookieParser = require('cookie-parser');
 let bodyParser   = require('body-parser');
 let flash = require('connect-flash');
 let errors = require('http-verror');
-let errorhandler = require('errorhandler');
+let myErrorHandler = require("./middleware/myErrorHandler.js");
+
 
 let app = express();
 require('dotenv').load();
@@ -66,11 +67,7 @@ let appEnv = {
 
 routes(app, appEnv);
 
-if (process.env.NODE_ENV == 'development'){
-	app.use(errorhandler());
-} else {
-	app.use(require("./middleware/myErrorHandler.js"));
-}
+app.use(myErrorHandler);
 
 let port = process.env.PORT || 8080;
 app.listen(port,  function () {

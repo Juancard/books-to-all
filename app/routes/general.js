@@ -9,7 +9,6 @@ module.exports = function (app, appEnv) {
 
   app.route('/')
     .get(function (req, res) {
-      throw new Error("puto")
       res.render(appEnv.path + '/app/views/index.pug');
     });
 
