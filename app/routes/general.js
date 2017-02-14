@@ -13,8 +13,10 @@ module.exports = function (app, appEnv) {
     });
 
   app.route('*')
-    .get(function(req, res){
-      res.render(appEnv.path + '/app/views/404.pug');
+    .get(function(req, res, next){
+      let error = new Error("The requested page does not exist");
+      error.status = 404;
+      next(error);
     });
 
 }

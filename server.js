@@ -63,6 +63,29 @@ var appEnv = {
 
 routes(app, appEnv);
 
+if (app.get('env') === 'development') {
+
+  app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.render(process.cwd() + '/app/views/error.pug', {
+        message: err.message,
+				status: err.status || 500,
+        error: err
+    });
+  });
+
+}
+// production error handler
+// no stacktraces leaked to user
+app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+		res.render(process.cwd() + '/app/views/error.pug', {
+        message: err.message,
+				status: err.status || 500,
+        error: {}
+    });
+});
+
 var port = process.env.PORT || 8080;
 app.listen(port,  function () {
 	console.log('Node.js listening on port ' + port + '...');
