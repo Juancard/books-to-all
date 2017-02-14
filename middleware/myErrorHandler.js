@@ -2,10 +2,9 @@
 
 module.exports = (err, req, res, next) => {
   res.status(err.statusCode || 500);
-  console.log(process.env.NODE_ENV);
   let out = {
     error: err,
-    developer: process.env.NODE_ENV
+    developer: process.env.NODE_ENV == 'development'
   }
   if (req.xhr) {
     res.json(out)
