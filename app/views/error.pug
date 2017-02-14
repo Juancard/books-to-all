@@ -9,6 +9,7 @@ block content
       span.error-icon.fa.fa-exclamation-circle
       h2.text-danger Error #{error.statusCode || 500}: #{error.name}
       h4.text-danger #{error.message}
+      -console.log(developer)
       if (developer)
         button#btn-spoiler.btn.btn-warning
           span.glyphicon.glyphicon-eye-open
