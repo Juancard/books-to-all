@@ -1,0 +1,8 @@
+extends skeleton.pug
+
+block append css
+  link(href='/public/css/books.css', rel='stylesheet', type="text/css")
+block append html_js
+  script(src="/public/js/modernizr")
+block content
+  include book.pug

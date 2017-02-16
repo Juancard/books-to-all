@@ -12,14 +12,13 @@ module.exports = function (app, appEnv) {
 
   app.route('/allbooks')
     .get(appEnv.middleware.isLoggedIn, (req, res, next) => {
-      next(new appEnv.errors.NotImplemented());
+      res.render(appEnv.path + "/app/views/allbooks.pug")
     });
 
   app.route('/books/search')
     .get((req, res, next) => {
       let field = req.query.field;
       let query = req.query.q;
-      console.log(query, field, req.query);
       apiBookHandler.searchRequest(query, field, (err, response, body) => {
         if (err) return next(new appEnv.errors.InternalError(err, 'In searching books'));
         let data = JSON.parse(xmlParser.toJson(body));
