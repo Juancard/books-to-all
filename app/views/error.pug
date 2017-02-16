@@ -26,12 +26,10 @@ block content
 block append js
   script.
     'use strict';
-
     (function () {
       let btnSpoiler = document.getElementById('btn-spoiler');
       let stackElement = document.getElementById('stack');
       btnSpoiler.addEventListener('click', (event) => {
         stackElement.hidden = !stackElement.hidden;
-          //if.style.display=='none') {document.getElementById('spoiler') .style.display=''}else{document.getElementById('spoiler') .style.display='none'}
       });
     })();
