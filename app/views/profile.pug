@@ -1,0 +1,38 @@
+extends skeleton.pug
+
+block content
+  .row
+    if (message && message.length > 0)
+      p#alert-message.alert.alert-danger
+        span.glyphicon.glyphicon-remove
+        |  #{message}
+  .row
+    .col-md-6
+      form(name="locationForm", action='/profile/location', method='POST')
+        h3.text-center Update Location
+        hr
+        .form-group
+          label(for="city") City
+          input.form-control(type='text', name='city', tabindex='1', required, autofocus='true')
+        .form-group
+          label(for="state") State
+          input.form-control(type='text', name='state', tabindex='2', required)
+        hr
+        button.btn.btn-success.btn-lg.btn-block(type='submit', tabindex='3')
+          span.glyphicon.glyphicon-send
+          |  Update Location
+
+    .col-md-6
+      form(name="passwordForm", action='/profile/password', method='POST')
+        h3.text-center Update Password
+        hr
+        .form-group
+          label(for="currentPassword") Current Password
+          input.form-control(type='password', name='currentPassword', tabindex='4', required)
+        .form-group
+          label(for="newPassword") New Password
+          input.form-control(type='text', name='newPassword', tabindex='5', required)
+        hr
+        button.btn.btn-success.btn-lg.btn-block(type='submit', tabindex='6')
+          span.glyphicon.glyphicon-send
+          |  Update Password

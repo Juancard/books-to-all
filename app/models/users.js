@@ -9,7 +9,9 @@ var User = new Schema({
 	local: {
 		displayName: String,
 		email: String,
-		password: String
+		password: String,
+		city: String,
+		state: String
 	}
 });
 
