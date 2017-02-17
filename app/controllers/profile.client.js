@@ -20,8 +20,9 @@
       newPassword: passwordForm.newPassword.value,
       currentPassword: passwordForm.currentPassword.value
     }
-    ajaxFunctions.ajaxRequest('POST', urlPassword, out, (data) => {
+    ajaxFunctions.ajaxRequest('POST', urlPassword, out, (err, data) => {
       btnSubmitPassword.disabled = false;
+      if (err) return errorHandler.onError(err);
       data = JSON.parse(data);
       if (data.message)
         showMessage(elementPasswordMessage, data.message);
@@ -34,8 +35,9 @@
       city: locationForm.city.value,
       state: locationForm.state.value
     }
-    ajaxFunctions.ajaxRequest('POST', urlLocation, out, (data) => {
+    ajaxFunctions.ajaxRequest('POST', urlLocation, out, (err, data) => {
       btnSubmitLocation.disabled = false;
+      if (err) return errorHandler.onError(err);
       data = JSON.parse(data);
       if (data.message)
         showMessage(elementLocationMessage, data.message);
@@ -47,7 +49,6 @@
 
   function showMessage(element, message) {
     // Clean element
-    element.hidden = true;
     element.innerHTML = '';
 
     // color element depending on success or error

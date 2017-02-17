@@ -19,13 +19,11 @@ var ajaxFunctions = {
       xmlhttp.onreadystatechange = function () {
         if (xmlhttp.readyState === 4) {
           if (xmlhttp.status === 200) {
-            callback(xmlhttp.response);
+            callback(false, xmlhttp.response);
           } else {
-            callback({
-              error: true,
-              message: xmlhttp.statusText,
-              status: xmlhttp.status
-            });
+            let err = new Error(xmlhttp.statusText);
+            err.status = xmlhttp.status;
+            callback(err);
           }
         }
       };

@@ -30,6 +30,9 @@ block html
             block content
           block footer
             include footer.pug
+          block error_message
+            include generalErrorMessage.pug
         block js
           script(type='text/javascript', src='/common/ajax-functions.js')
           script(type='text/javascript', src='/common/helper.js')
+          script(type='text/javascript', src='/common/errorHandler.js')

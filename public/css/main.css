@@ -72,7 +72,20 @@ header span {
 .features {
   margin: 20px;
 }
-
+/**************************
+  GENERAL ERROR MESSAGE
+****************************/
+#generalErrorMessage {
+  position: fixed;
+  top: 0;
+  right: 0;
+  margin: 10px;
+  visibility: hidden;
+}
+#generalErrorMessage button{
+  color: #D8000C;
+  background-color: #FFBABA;
+}
 /**************************
   FOOTER
 ****************************/
