@@ -7,7 +7,7 @@ module.exports = (err, req, res, next) => {
     developer: process.env.NODE_ENV == 'development'
   }
   if (req.xhr) {
-    res.json(out)
+    res.json(err)
   }else {
     res.render(process.cwd() + '/app/views/error.pug', out);
   }

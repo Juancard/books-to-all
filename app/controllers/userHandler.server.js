@@ -28,6 +28,35 @@ function userHandler () {
         }
         return callback(false, out);
       })
+  },
+
+  this.updatePassword = (user, currentPassword, newPassword, callback) => {
+    User
+      .findById(user.id)
+      .exec( (err, userData) => {
+        if (err)
+          return callback(
+            new http_verror.InternalError(
+              "Could not retrieve user by Id"
+            )
+          );
+        if (!userData.validPassword(currentPassword))
+          return callback(
+            new http_verror.Unauthorized(
+              "Password is not valid"
+            )
+          );
+        userData.local.password = userData.generateHash(newPassword);
+        userData.save( (err, result) => {
+          if (err)
+            return callback(
+              new http_verror.InternalError(
+                "Could not save new user password"
+              )
+            );
+          return callback(false, result);
+        });
+      })
   }
 }
 

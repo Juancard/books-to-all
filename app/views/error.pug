@@ -8,7 +8,7 @@ block content
     .error-template.text-center
       span.error-icon.fa.fa-exclamation-circle
       h2.text-danger Error #{error.statusCode || 500}: #{error.name}
-      h4.text-danger #{error.message}
+      h4.text-danger #{error.toString()}
       if (developer)
         button#btn-spoiler.btn.btn-warning
           span.glyphicon.glyphicon-eye-open
