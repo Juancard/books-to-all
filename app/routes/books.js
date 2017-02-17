@@ -37,7 +37,7 @@ module.exports = function (app, appEnv) {
       apiBookHandler.searchRequest(query, field, (err, response, body) => {
         if (err) return next(new appEnv.errors.InternalError(err, 'In searching books'));
         let data = JSON.parse(xmlParser.toJson(body));
-        res.json(data);
+        res.json(data.GoodreadsResponse.search);
       });
     });
 }

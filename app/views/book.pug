@@ -8,5 +8,5 @@ block append html_js
     .row
       .col-xs-6.col-sm-3.col-sm-offset-0
         .book
-          a(href="/")
-            img.img-responsive(alt="book", src="http://srobbin.com/wp-content/uploads/2012/05/book.jpg")
+          a(href=book.img)
+            img.img-responsive(alt="book-"+book.title, src=book.img)
