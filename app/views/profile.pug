@@ -1,38 +1,46 @@
 extends skeleton.pug
 
 block content
-  .row
-    if (message && message.length > 0)
-      p#alert-message.alert.alert-danger
-        span.glyphicon.glyphicon-remove
-        |  #{message}
+  br
   .row
     .col-md-6
-      form(name="locationForm", action='/profile/location', method='POST')
-        h3.text-center Update Location
-        hr
-        .form-group
-          label(for="city") City
-          input.form-control(type='text', name='city', tabindex='1', required, autofocus='true')
-        .form-group
-          label(for="state") State
-          input.form-control(type='text', name='state', tabindex='2', required)
-        hr
-        button.btn.btn-success.btn-lg.btn-block(type='submit', tabindex='3')
-          span.glyphicon.glyphicon-send
-          |  Update Location
+      .panel.panel-info
+        .panel-heading
+          h3.panel-title Update Location
+        .panel-body
+          if (location.message)
+            p#alert-message.alert(class=(location.message.type=='success')? 'alert-success' : 'alert-danger')
+              span.glyphicon(class=(location.message.type=='success')? 'glyphicon-ok' : 'glyphicon-remove')
+              |  #{location.message.value}
+          form(name="locationForm", action='/profile/location', method='POST')
+            .form-group
+              label(for="city") City
+              -let city = (location && location.city)? location.city : '';
+              input.form-control(type='text', name='city', value=city, placeholder='Austin', tabindex='1', required, autofocus='true')
+            .form-group
+              label(for="state") State
+              -let state = (location && location.state)? location.state : '';
+              input.form-control(type='text', name='state', value=state, placeholder='Texas', tabindex='2', required)
+            button.btn.btn-success.btn-lg.btn-block(type='submit', tabindex='3')
+              span.glyphicon.glyphicon-send
+              |  Update
 
     .col-md-6
-      form(name="passwordForm", action='/profile/password', method='POST')
-        h3.text-center Update Password
-        hr
-        .form-group
-          label(for="currentPassword") Current Password
-          input.form-control(type='password', name='currentPassword', tabindex='4', required)
-        .form-group
-          label(for="newPassword") New Password
-          input.form-control(type='text', name='newPassword', tabindex='5', required)
-        hr
-        button.btn.btn-success.btn-lg.btn-block(type='submit', tabindex='6')
-          span.glyphicon.glyphicon-send
-          |  Update Password
+      .panel.panel-warning
+        .panel-heading
+          h3.panel-title Update Password
+        .panel-body
+          if (message && message.password && message.password.length > 0)
+            p#alert-message.alert.alert-danger
+              span.glyphicon.glyphicon-remove
+              |  #{message.password}
+          form(name="passwordForm", action='/profile/password', method='POST')
+            .form-group
+              label(for="currentPassword") Current Password
+              input.form-control(type='password', name='currentPassword', tabindex='4', required)
+            .form-group
+              label(for="newPassword") New Password
+              input.form-control(type='text', name='newPassword', tabindex='5', required)
+            button.btn.btn-success.btn-lg.btn-block(type='submit', tabindex='6')
+              span.glyphicon.glyphicon-send
+              |  Update
