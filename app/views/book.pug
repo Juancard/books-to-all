@@ -1,9 +1,11 @@
-.books.row
-  .col-sm-2
-    .book
-      a(href="/")
-        img.img-responsive(alt="book", src="http://srobbin.com/wp-content/uploads/2012/05/book.jpg", width="200", height="200")
-  .col-sm-2
-    .book
-      a(href="/")
-        img.img-responsive(width="200", height="200",alt="book", src="http://www.creativindie.com/wp-content/uploads/2013/10/Enchantment-Book-Cover-Best-Seller1.jpg")
+block append css
+  link(href='/public/css/books.css', rel='stylesheet', type="text/css")
+block append html_js
+  script(src="/public/js/modernizr")
+
+.books
+  .row
+    .col-xs-6.col-sm-3.col-sm-offset-0
+      .book
+        a(href="/")
+          img.img-responsive(alt="book", src="http://srobbin.com/wp-content/uploads/2012/05/book.jpg")

@@ -6,8 +6,8 @@ module.exports = function (app, appEnv) {
   let apiBookHandler = new ApiBookHandler();
 
   app.route('/mybooks')
-    .get(appEnv.middleware.isLoggedIn, (req, res, next) => {
-      next(new appEnv.errors.NotImplemented());
+    .get(/*appEnv.middleware.isLoggedIn,*/ (req, res, next) => {
+      res.render(appEnv.path + "/app/views/mybooks.pug")
     });
 
   app.route('/allbooks')
