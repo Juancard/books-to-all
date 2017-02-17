@@ -8,11 +8,8 @@ block content
         .panel-heading
           h3.panel-title Update Location
         .panel-body
-          if (location.message)
-            p#locationMessage.alert(class=(location.message.type=='success')? 'alert-success' : 'alert-danger')
-              span.glyphicon(class=(location.message.type=='success')? 'glyphicon-ok' : 'glyphicon-remove')
-              |  #{location.message.value}
-          form(name="locationForm", action='/profile/location', method='POST')
+          p#locationMessage(hidden='')
+          form(name="locationForm")
             .form-group
               label(for="city") City
               -let city = (location && location.city)? location.city : '';
@@ -41,6 +38,6 @@ block content
             button.btn.btn-success.btn-lg.btn-block(type='submit', tabindex='6')
               span.glyphicon.glyphicon-send
               |  Update
-              
+
 block append js
   script(src="/controllers/profile.client.js")

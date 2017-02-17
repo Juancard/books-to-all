@@ -19,14 +19,9 @@ module.exports = function (app, appEnv) {
               err, "Error in getting user location"
             )
           );
-        result.message = req.flash('locationMessage')[0];
         let out = {
-          location: result,
-          password: {
-            message: req.flash('passwordMessage')[0]
-          }
+          location: result
         };
-        console.log(out);
         res.render(appEnv.path + '/app/views/profile.pug', out);
       })
 		});
@@ -40,11 +35,12 @@ module.exports = function (app, appEnv) {
               err, "Error in updating user location"
             )
           );
-        req.flash('locationMessage', {
-          type: 'success',
-          value: 'Updated!'
+        res.json({
+          message: {
+            type: 'success',
+            value: 'Updated!'
+          }
         })
-        res.redirect('/profile')
       })
     });
 
@@ -53,23 +49,12 @@ module.exports = function (app, appEnv) {
       userHandler.updatePassword(req.user,
         req.body.currentPassword, req.body.newPassword,
         (err, result) => {
-          let out;
-          if (err) {
-            out = {
-              message: {
-                type: 'error',
-                value: err.message
-              }
+          res.json({
+            message: {
+              type: (err)? 'error' : 'success',
+              value: (err)? err.message : 'Updated!'
             }
-          } else {
-            out = {
-              message: {
-                type: 'success',
-                value: 'Updated!'
-              }
-            }
-          }
-          res.json(out);
+          });
       });
     });
 }
