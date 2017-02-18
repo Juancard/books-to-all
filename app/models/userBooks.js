@@ -6,24 +6,32 @@ var Schema = mongoose.Schema;
 var UserBook = new Schema({
   book: {
     type: Schema.Types.ObjectId,
-    ref: 'Book'
+    ref: 'Book',
+    required: true,
   },
   user: {
     type: Schema.Types.ObjectId,
     ref: 'User'
+    required: true,
   },
-  state: { 
+  state: {
     type: String,
     enum: ['active', 'inactive'],
+    required: true,
     lowercase: true,
     trim: true
   },
   dateAdded: {
+    required: true
     type: Date,
     default: Date.now
   },
-	img: String
+	img: {
+    type: String
+  }
 });
+
+UserBook.index({ book: 1, user: 1}, { unique: true });
 
 UserBook.statics
   .newInstance = function newInstance(book, user, state='active'
