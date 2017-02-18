@@ -12,8 +12,7 @@ var User = new Schema({
 		password: String,
 		city: String,
 		state: String
-	},
-	books: [{type: Schema.Types.ObjectId, ref: 'Book'}]
+	}
 });
 
 // methods ======================

@@ -13,7 +13,6 @@ function apiBookHandler() {
     /* The type of request */
     let httpMethod = 'GET';
 
-    //let apiURL = this.makeApiUrl(httpMethod, this.searchUrl, set_parameters);
     let params = {
       key: this.key,
       q: query,
@@ -23,6 +22,7 @@ function apiBookHandler() {
     let paramsUrl = qs.stringify(params);
     let apiURL = this.searchUrl + '?' + paramsUrl;
     console.log(apiURL);
+
     /* Then we use request to send make the API Request */
     request(apiURL, function(error, response, body){
       if (error) return callback(new HttpVerror.InternalError(error, 'calling books api'))

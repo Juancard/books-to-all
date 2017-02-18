@@ -32,7 +32,7 @@ module.exports = function (app, appEnv) {
 
   app.route('/books/search')
     .get((req, res, next) => {
-      let field = req.query.field;
+      let field = req.query.search;
       let query = req.query.q;
       apiBookHandler.searchRequest(query, field, (err, response, body) => {
         if (err) return next(new appEnv.errors.InternalError(err, 'In searching books'));
