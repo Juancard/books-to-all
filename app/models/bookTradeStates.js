@@ -23,7 +23,7 @@ var BookTradeState = new Schema({
   }
 });
 
-UserBook.index({ bookTrade: 1, date: -1}, { unique: true });
+BookTradeState.index({ bookTrade: 1, date: -1}, { unique: true });
 
 BookTradeState.statics
   .newInstance = function newInstance(bookTrade, state='pending') {

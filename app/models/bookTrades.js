@@ -38,7 +38,7 @@ var BookTrade = new Schema({
   }
 });
 
-UserBook.index({ userBook: 1, requestedBy: 1, dateAdded:-1}, { unique: true });
+BookTrade.index({ userBook: 1, requestedBy: 1, dateAdded:-1}, { unique: true });
 
 BookTrade.statics
   .newInstance = function newInstance(userBook, requestedBy, state,
@@ -47,9 +47,9 @@ BookTrade.statics
 
 	newBookTrade.userBook = userBook;
 	newBookTrade.requestedBy = requestedBy;
-	newBookTrade.state = state;
-  (startsOn)? newBookTrade.startsOn = startsOn;
-  (startsOn)? newBookTrade.endsOn = endsOn;
+  if (startsOn) newBookTrade.startsOn = startsOn;
+  if (startsOn) newBookTrade.endsOn = endsOn;
+  newBookTrade.state = state;
 
   return newBookTrade;
 }

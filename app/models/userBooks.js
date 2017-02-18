@@ -11,8 +11,8 @@ var UserBook = new Schema({
   },
   user: {
     type: Schema.Types.ObjectId,
-    ref: 'User'
-    required: true,
+    ref: 'User',
+    required: true
   },
   state: {
     type: String,
@@ -22,26 +22,26 @@ var UserBook = new Schema({
     trim: true
   },
   dateAdded: {
-    required: true
+    required: true,
     type: Date,
     default: Date.now
   },
-	img: {
+	imageUrl: {
     type: String
   }
 });
 
-UserBook.index({ book: 1, user: 1}, { unique: true });
+UserBook.index({ book: 1, user: 1, dateAdded: -1}, { unique: true });
 
 UserBook.statics
   .newInstance = function newInstance(book, user, state='active'
-    , img=null) {
+    , imageUrl=null) {
   let newBookUser = new this();
 
 	newBookUser.book = book;
 	newBookUser.user = user;
   newBookUser.state = state;
-	newBookUser.img = img;
+	newBookUser.imageUrl = imageUrl;
 
   return newBookUser;
 }

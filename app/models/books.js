@@ -29,19 +29,26 @@ var Book = new Schema({
     lowercase: true,
     trim: true
   },
-	img: String
+	imageUrl: {
+		type: String,
+		required: true
+	},
+	publicationYear: {
+		type: Number
+	}
 });
 
 Book.statics
   .newInstance = function newInstance(title, author, goodreadsId,
-		img, state='active') {
+		imageUrl, publicationYear, state='active') {
   let newBook = new this();
 
 	newBook.title = title;
 	newBook.author = author;
 	newBook.goodreadsId = goodreadsId;
-	newBook.img = img;
+	newBook.imageUrl = imageUrl;
 	newBook.state = state;
+	newBook.publicationYear = publicationYear;
 
   return newBook;
 }
