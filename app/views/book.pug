@@ -3,10 +3,10 @@ block append css
 block append html_js
   script(src="/public/js/modernizr.js")
 
-.books
+.books.row
   each userBook in books
-    .row
-      .col-xs-6.col-sm-3.col-sm-offset-0
-        .book
-          a(href=userBook.img || userBook.book.img)
-            img.img-responsive(alt="book-"+userBook.book.title, src=userBook.img || userBook.book.img)
+    -console.log(userBook)
+    .col-xs-4.col-sm-3.col-md-2
+      .book(data-toggle='tooltip', title=userBook.book.title + " by "+ userBook.book.author)
+        a(href=userBook.imageUrl || userBook.book.imageUrl)
+          img.img-responsive(height="150", width="150", alt="book-"+userBook.book.title, src=userBook.imageUrl || userBook.book.imageUrl)

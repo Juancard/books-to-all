@@ -6,6 +6,10 @@
   let urlSearchBooks = appUrl + '/books/search';
   let urlAddBook = appUrl + '/books/add';
 
+  ajaxFunctions.ready(() => {
+    $('[data-toggle="tooltip"]').tooltip(); 
+  });
+
   let onAddBook = e => {
     e.preventDefault();
     btnSubmitBook.disabled = true;
