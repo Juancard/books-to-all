@@ -34,8 +34,8 @@ var UserBook = new Schema({
 UserBook.index({ book: 1, user: 1, dateAdded: -1}, { unique: true });
 
 UserBook.statics
-  .newInstance = function newInstance(book, user, state='active'
-    , imageUrl=null) {
+  .newInstance = function newInstance(book, user, imageUrl=null, 
+    state='active') {
   let newBookUser = new this();
 
 	newBookUser.book = book;

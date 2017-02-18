@@ -35,9 +35,35 @@ module.exports = function (app, appEnv) {
       let field = req.query.search;
       let query = req.query.q;
       apiBookHandler.searchRequest(query, field, (err, response, body) => {
-        if (err) return next(new appEnv.errors.InternalError(err, 'In searching books'));
+        if (err)
+          return next(
+            new appEnv.errors.InternalError(
+              err,
+              'Failed on searching book'
+            )
+          );
         let data = JSON.parse(xmlParser.toJson(body));
         res.json(data.GoodreadsResponse.search);
+      });
+    });
+
+  app.route('/books/add')
+    .post(appEnv.middleware.isLoggedIn, (req, res, next) => {
+      console.log("in route add book to user");
+      console.log("Book before: ", req.body.book);
+      let bookJson = apiBookHandler.getBookData(req.body.book);
+      console.log("Book after: ", bookJson);
+      bookHandler.addBookToUser(req.user, bookJson, (err, result) => {
+        console.log("error? ", err.toString());
+        if (err)
+          return next(
+            new appEnv.errors.InternalError(
+              err,
+              'Failed to add book to user'
+            )
+          );
+        console.log("route - added: ", result);
+        res.json(result);
       });
     });
 }

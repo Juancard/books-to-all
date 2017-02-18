@@ -28,6 +28,17 @@ function apiBookHandler() {
       if (error) return callback(new HttpVerror.InternalError(error, 'calling books api'))
       return callback(false, response, body);
     });
+  },
+
+  this.getBookData = (bookGivenByApi) => {
+    return {
+      title: bookGivenByApi.best_book.title,
+      author: bookGivenByApi.best_book.author.name,
+      imageUrl: bookGivenByApi.best_book.image_url,
+      goodreadsId: bookGivenByApi.id['$t'],
+      publicationYear: bookGivenByApi.original_publication_year['$t'],
+      averageRating: bookGivenByApi.average_rating
+    }
   }
 };
 

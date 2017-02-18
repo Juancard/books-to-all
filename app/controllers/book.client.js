@@ -4,6 +4,7 @@
   let formAddBook = document.forms['addBookForm'];
   let btnSubmitBook = formAddBook.getElementsByTagName('BUTTON')[0];
   let urlSearchBooks = appUrl + '/books/search';
+  let urlAddBook = appUrl + '/books/add';
 
   let onAddBook = e => {
     e.preventDefault();
@@ -16,9 +17,23 @@
       data = JSON.parse(data);
       let books = data.results.work;
       if (!books) return console.log("No books");
-      console.log(books[0].best_book.title);
+
+      // HARDCODE: CHOOSE BOOK ARBITRARIALY
+      let bookChosen = books[0];
+      addToUserBooks(bookChosen)
     });
   }
 
   formAddBook.addEventListener("submit", onAddBook);
+
+  function addToUserBooks(bookChosen){
+    let out = {
+      book: bookChosen
+    }
+    ajaxFunctions.ajaxRequest('POST', urlAddBook, out, (err, data) => {
+      if (err) return errorHandler.onError(err);
+      data = JSON.parse(data);
+      console.log("Book added: ", data);
+    })
+  }
 })();

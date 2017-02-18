@@ -4,9 +4,9 @@ block append html_js
   script(src="/public/js/modernizr.js")
 
 .books
-  each book in books
+  each userBook in books
     .row
       .col-xs-6.col-sm-3.col-sm-offset-0
         .book
-          a(href=book.img)
-            img.img-responsive(alt="book-"+book.title, src=book.img)
+          a(href=userBook.img || userBook.book.img)
+            img.img-responsive(alt="book-"+userBook.book.title, src=userBook.img || userBook.book.img)
