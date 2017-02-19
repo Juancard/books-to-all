@@ -3,7 +3,7 @@
 (function () {
   let formAddBook = document.forms['addBookForm'];
   let btnSubmitBook = formAddBook.getElementsByTagName('BUTTON')[0];
-  let bookContainer = document.getElementsByClassName('books')[0];
+  let bookContainer = document.getElementsByClassName('books')[0].firstChild;
   let bookTemplate = document.getElementById('book-template').firstChild;
 
   let urlSearchBooks = appUrl + '/books/search';

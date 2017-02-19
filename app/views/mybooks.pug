@@ -1,19 +1,21 @@
 extends skeleton.pug
 
+block append css
+  link(href='/public/css/mybooks.css', rel='stylesheet', type='text/css')
+
 block content
-  .container
-    .row
-      header
-        h3(style="float: left") My Books
-        form(style="float: right")(name="addBookForm")
+  header.row
+    .container
+      h3 My Books
+      .row
+        form(name="addBookForm").col-md-4.col-md-offset-8
           .input-group
-            input.form-control(type="text", name='book', placeholder="Search and add book", tabindex='1', required)
+            input.form-control(type="text", name='book', placeholder="Search & add books", tabindex='1', required)
             span.input-group-btn
               button.btn.btn-default(type="submit", tabindex='2')
                 span.glyphicon.glyphicon-search
-    .row
-      hr
-      include book.pug
+  .container
+    include book.pug
 
 block append js
   script(src="/controllers/book.client.js")

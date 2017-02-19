@@ -1,7 +1,9 @@
 /* Fallback styles */
+
 .book {
   display: inline-block;
   box-shadow: 5px 5px 20px #333;
+  margin: 15% 0px;
 }
 
 .book img {
