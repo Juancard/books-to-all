@@ -3,6 +3,11 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
+const StateHandler = require('../controllers/stateHandler.db.js')
+const STATES = ['pending', 'accepted', 'denied', 'finished'];
+const DEFAULT_STATE_NUMBER = 0
+const stateHandler = new StateHandler(STATES, DEFAULT_STATE_NUMBER);
+
 var BookTradeState = new Schema({
 	bookTrade: {
     type: Schema.Types.ObjectId,
@@ -14,13 +19,14 @@ var BookTradeState = new Schema({
 		required: true,
     default: Date.now
   },
-  state: {
-    type: String,
+	state: {
+		type: Number,
+		min: 0,
+    max: STATES.length - 1,
 		required: true,
-    enum: ['pending', 'accepted', 'denied', 'finished'],
-    lowercase: true,
-    trim: true
-  }
+		set: stateHandler.stateStringToNumber,
+		get: stateHandler.stateNumberToString
+	},
 });
 
 BookTradeState.index({ bookTrade: 1, date: -1}, { unique: true });
@@ -34,5 +40,7 @@ BookTradeState.statics
 
   return newBookTradeState;
 }
+
+Book.statics.getStateNumber = stateHandler.stateStringToNumber;
 
 module.exports = mongoose.model('BookTradeState', BookTradeState);

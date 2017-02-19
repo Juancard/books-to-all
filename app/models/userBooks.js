@@ -3,6 +3,11 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
+const StateHandler = require('../controllers/stateHandler.db.js')
+const STATES = ['inactive', 'active'];
+const DEFAULT_STATE_NUMBER = 0
+const stateHandler = new StateHandler(STATES, DEFAULT_STATE_NUMBER);
+
 var UserBook = new Schema({
   book: {
     type: Schema.Types.ObjectId,
@@ -15,12 +20,13 @@ var UserBook = new Schema({
     required: true
   },
   state: {
-    type: String,
-    enum: ['active', 'inactive'],
-    required: true,
-    lowercase: true,
-    trim: true
-  },
+		type: Number,
+		min: 0,
+    max: STATES.length - 1,
+		required: true,
+		set: stateHandler.stateStringToNumber,
+		get: stateHandler.stateNumberToString
+	},
   dateAdded: {
     required: true,
     type: Date,
@@ -31,10 +37,12 @@ var UserBook = new Schema({
   }
 });
 
+
+UserBook.set('toObject', { getters: true });
 UserBook.index({ book: 1, user: 1, dateAdded: -1}, { unique: true });
 
 UserBook.statics
-  .newInstance = function newInstance(book, user, imageUrl=null, 
+  .newInstance = function newInstance(book, user, imageUrl=null,
     state='active') {
   let newBookUser = new this();
 
@@ -45,5 +53,7 @@ UserBook.statics
 
   return newBookUser;
 }
+
+UserBook.statics.getStateNumber = stateHandler.stateStringToNumber;
 
 module.exports = mongoose.model('UserBook', UserBook);

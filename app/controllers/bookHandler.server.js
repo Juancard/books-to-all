@@ -22,10 +22,11 @@ function bookHandler () {
   },
   this.getBooksByUser = (user, callback) => {
     console.log("Searching books in bd by user:", user.id);
+    let stateNumber = UserBook.getStateNumber('active');
     UserBook
       .find({
         user: user.id,
-        state: 'active'
+        state: stateNumber
       })
       .sort({ dateAdded: -1 })
       .populate('book')
@@ -62,6 +63,7 @@ function bookHandler () {
             bookJson.goodreadsId, bookJson.imageUrl,
             bookJson.publicationYear);
         }
+        console.log("book before saveing: ", book);
         book.save((err, result) => {
           if (err)
             return callback(

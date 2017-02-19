@@ -3,6 +3,11 @@
 var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
+const StateHandler = require('../controllers/stateHandler.db.js')
+const STATES = ['inactive', 'active'];
+const DEFAULT_STATE_NUMBER = 0
+const stateHandler = new StateHandler(STATES, DEFAULT_STATE_NUMBER);
+
 var Book = new Schema({
 	title: {
 		type: String,
@@ -23,12 +28,13 @@ var Book = new Schema({
 		default: Date.now
 	},
 	state: {
-    type: String,
-    enum: ['active', 'inactive'],
+		type: Number,
+		min: 0,
+    max: STATES.length - 1,
 		required: true,
-    lowercase: true,
-    trim: true
-  },
+		set: stateHandler.stateStringToNumber,
+		get: stateHandler.stateNumberToString
+	},
 	imageUrl: {
 		type: String,
 		required: true
@@ -37,6 +43,24 @@ var Book = new Schema({
 		type: Number
 	}
 });
+
+/****************** States getter and setter ********************/
+Book.set('toObject', { getters: true });
+function stateStringToNumber (stateString) {
+	stateString = stateString.trim().toLowerCase();
+	let stateNumber = STATES.indexOf(stateString);
+  return (stateString == -1)? DEFAULT_STATE_NUMBER : stateNumber;
+}
+function stateNumberToString (stateNumber) {
+	if (stateNumber >= STATES.length)
+		stateNumber = DEFAULT_STATE_NUMBER;
+  return STATES[stateNumber];
+}
+Book.statics
+  .getStateNumber = function getStateNumber(stateString) {
+    return stateStringToNumber(stateString);
+  }
+/****************** END - States getter and setter **************/
 
 Book.statics
   .newInstance = function newInstance(title, author, goodreadsId,
@@ -49,8 +73,9 @@ Book.statics
 	newBook.imageUrl = imageUrl;
 	newBook.state = state;
 	newBook.publicationYear = publicationYear;
-
   return newBook;
 }
+
+Book.statics.getStateNumber = stateHandler.stateStringToNumber;
 
 module.exports = mongoose.model('Book', Book);
