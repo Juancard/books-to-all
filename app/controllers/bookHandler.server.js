@@ -27,6 +27,7 @@ function bookHandler () {
         user: user.id,
         state: 'active'
       })
+      .sort({ dateAdded: -1 })
       .populate('book')
       .exec( (err, results) => {
         if (err)
@@ -36,7 +37,6 @@ function bookHandler () {
               "Could not retrieve user's active books by user Id"
             )
           );
-        console.log("books by user: ", results);
         callback(false, results);
       })
   },
@@ -56,7 +56,6 @@ function bookHandler () {
               "On checking if book exists in database"
             )
           );
-        console.log("Book found by unique Id: ", book);
         if (!book) {
           // Book was not in bd.
           book = Book.newInstance(bookJson.title, bookJson.author,
@@ -71,7 +70,6 @@ function bookHandler () {
                 "Could not save book in database"
               )
             );
-          console.log("Book saved: ", result);
 
           // Create new copy of book for the user
           let newUserBook = UserBook.newInstance(result.id, user.id);
@@ -83,6 +81,7 @@ function bookHandler () {
                   "Could not add book to user in database"
                 )
               );
+            result.book = book;
             return callback(false, result);
           })
         })

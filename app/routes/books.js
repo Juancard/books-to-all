@@ -10,7 +10,6 @@ module.exports = function (app, appEnv) {
   app.route('/mybooks')
     .get(appEnv.middleware.isLoggedIn, (req, res, next) => {
       bookHandler.getBooksByUser(req.user, (err, results) => {
-        console.log("Books found:", results);
         if (err)
           return next(new appEnv.errors.InternalError(
               err,
@@ -20,7 +19,6 @@ module.exports = function (app, appEnv) {
         let out = {
           books: results
         }
-        console.log("Route - Found: ", out);
         res.render(appEnv.path + "/app/views/mybooks.pug", out);
       });
     });
@@ -50,11 +48,8 @@ module.exports = function (app, appEnv) {
   app.route('/books/add')
     .post(appEnv.middleware.isLoggedIn, (req, res, next) => {
       console.log("in route add book to user");
-      console.log("Book before: ", req.body.book);
       let bookJson = apiBookHandler.getBookData(req.body.book);
-      console.log("Book after: ", bookJson);
       bookHandler.addBookToUser(req.user, bookJson, (err, result) => {
-        console.log("error? ", err.toString());
         if (err)
           return next(
             new appEnv.errors.InternalError(
@@ -62,7 +57,6 @@ module.exports = function (app, appEnv) {
               'Failed to add book to user'
             )
           );
-        console.log("route - added: ", result);
         res.json(result);
       });
     });

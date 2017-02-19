@@ -5,8 +5,13 @@ block append html_js
 
 .books.row
   each userBook in books
-    -console.log(userBook)
     .col-xs-4.col-sm-3.col-md-2
       .book(data-toggle='tooltip', title=userBook.book.title + " by "+ userBook.book.author)
         a(href=userBook.imageUrl || userBook.book.imageUrl)
           img.img-responsive(height="150", width="150", alt="book-"+userBook.book.title, src=userBook.imageUrl || userBook.book.imageUrl)
+
+#book-template(style='display: none')
+  .col-xs-4.col-sm-3.col-md-2
+    .book(data-toggle='tooltip', title='')
+      a(href='')
+        img.img-responsive(height="150", width="150", alt="", src='')

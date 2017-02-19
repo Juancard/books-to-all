@@ -2,19 +2,18 @@ extends skeleton.pug
 
 block content
   .container
-    h3 My Books
-    hr
     .row
-      .col-md-6.col-md-offset-3
-        form(name="addBookForm")
-          .form-group
-            label(for="book") Add Book
-            input.form-control(type='text', name='book', placeholder="Moby Dick", tabindex='1', required, autofocus='true')
-          button.btn.btn-success.btn-block(type='submit', tabindex='2')
-            span.glyphicon.glyphicon-send
-            |  Add
-    hr
-    include book.pug
+      header
+        h3(style="float: left") My Books
+        form(style="float: right")(name="addBookForm")
+          .input-group
+            input.form-control(type="text", name='book', placeholder="Search and add book", tabindex='1', required)
+            span.input-group-btn
+              button.btn.btn-default(type="submit", tabindex='2')
+                span.glyphicon.glyphicon-search
+    .row
+      hr
+      include book.pug
 
 block append js
   script(src="/controllers/book.client.js")
