@@ -5,7 +5,7 @@ var errorHandler = {
     let m = document.getElementById('generalErrorMessage');
     let btn = m.getElementsByTagName('BUTTON')[0];
     btn.childNodes[1].textContent = " Error " + err.status + ": " + err.message;
-    m.style.visibility = 'visible';
+    m.style.display = 'block';
     m.focus();
   }
 }
