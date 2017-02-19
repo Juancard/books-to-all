@@ -29,7 +29,8 @@ module.exports = function (passport) {
       // find a user whose email is the same as the forms email
       // we are checking to see if the user trying to login already exists
 			console.log("en local signup passport");
-			User.findOne({ 'local.email' :  email }, function(err, user) {
+
+			User.findOne({ 'local.email' :  email.toLowerCase().trim() }, function(err, user) {
 	      // if there are any errors, return the error
 	      if (err) return done(err);
 	      // check to see if theres already a user with that email
@@ -62,7 +63,7 @@ module.exports = function (passport) {
     process.nextTick(function() {
       // find a user whose email is the same as the forms email
       // we are checking to see if the user trying to login already exists
-      User.findOne({ 'local.email' :  email }, function(err, user) {
+      User.findOne({ 'local.email' :  email.toLowerCase().trim() }, function(err, user) {
         if (err) return done(err);
         if (!user) return done(null, false, req.flash('loginMessage', 'Incorrect User.'));
         if (!user.validPassword(password)) return done(null, false, req.flash('loginMessage', 'Incorrect Password.'));
