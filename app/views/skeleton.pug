@@ -17,6 +17,10 @@ block html
           link(rel='stylesheet', href="/bootstrap/css/bootstrap.min.css")
           link(rel='stylesheet', href="//maxcdn.bootstrapcdn.com/font-awesome/4.2.0/css/font-awesome.min.css")
       block html_js
+        // jQuery (necessary for Bootstrap's JavaScript plugins)
+        script(src='/js/jquery/jquery.min.js')
+        script(src='/bootstrap/js/bootstrap.min.js')
+        script(src='https://raw.github.com/HubSpot/pace/v1.0.2/pace.min.js')
     block body
       body
         .container-fluid
@@ -29,10 +33,7 @@ block html
           block error_message
             include generalErrorMessage.pug
         block js
-          // jQuery (necessary for Bootstrap's JavaScript plugins)
-          script(src='/js/jquery/jquery.min.js')
-          script(src='/bootstrap/js/bootstrap.min.js')
-          script(src='https://raw.github.com/HubSpot/pace/v1.0.2/pace.min.js')
+          script(src='https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js')
           script(type='text/javascript', src='/common/ajax-functions.js')
           script(type='text/javascript', src='/common/helper.js')
           script(type='text/javascript', src='/common/errorHandler.js')
