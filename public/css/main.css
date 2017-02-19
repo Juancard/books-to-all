@@ -33,45 +33,10 @@ body {
   padding-bottom:100px;   /* Height of the footer */
 }
 
-header {
-	text-align: center;
-	padding: 30px;
-  background-color: rgb(67, 140, 185);
-  color: white;
-}
-header h1 {
-  font-family: Book Antiqua,Palatino,Palatino Linotype,Palatino LT STD,Georgia,serif;
-  font-size: 5em;
-}
-header span {
-  margin-top: 10px;
-  font-size: 5em;
-}
-
 .navbar {
   margin-bottom: 0px !important;
 }
 
-.features li:before {
-  content: '✔';
-  color: rgb(67, 140, 185);
-  margin-left: 0em; margin-right: .300em;
-}
-.features li {
-  font-size: 1.75em;
-  font-family: Book Antiqua,Palatino,Palatino Linotype,Palatino LT STD,Georgia,serif;
-  margin: 5px;
-}
-.features ul {
-  padding-left:20px;
-  text-indent:2px;
-  list-style: none;
-  list-style-position:outside;
-  margin: 20px;
-}
-.features {
-  margin: 20px;
-}
 /**************************
   GENERAL ERROR MESSAGE
 ****************************/
@@ -80,7 +45,7 @@ header span {
   top: 0;
   right: 0;
   margin: 10px;
-  visibility: hidden;
+  display: none;
 }
 #generalErrorMessage button{
   color: #D8000C;
