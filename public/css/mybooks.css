@@ -1,0 +1,16 @@
+header {
+	padding: 30px;
+  background-color: rgb(67, 140, 185);
+  color: white;
+}
+header h3 {
+  font-family: Book Antiqua,Palatino,Palatino Linotype,Palatino LT STD,Georgia,serif;
+  font-size: 4em;
+}
+
+
+@media only screen and (max-width: 400px) {
+   header h3 {
+     font-size: 3em;
+   }
+}
