@@ -7,6 +7,30 @@ module.exports = function (app, appEnv) {
   let BookHandler = require(appEnv.path + '/app/controllers/bookHandler.server.js');
   let bookHandler = new BookHandler();
 
+  app.param("userBook",  function (req, res, next, userBookId) {
+
+    console.log("Requested userBook id: ", userBookId);
+
+    // ... VALIDATE USERBOOK ID
+    pollHandler.getUserBookById(userBookId, function(err, userBook){
+      if (err)
+        return next(
+          new appEnv.errors.InternalError(
+            err,
+            "Error in retrieving the requested user's book"
+          )
+        );
+      if (!req.userBook)
+        return next(
+          new appEnv.errors.NotFound(
+            "The resource requested is not available"
+          )
+        );
+      req.userBook = userBook;
+      return next();
+    });
+  });
+
   app.route('/mybooks')
     .get(appEnv.middleware.isLoggedIn, (req, res, next) => {
       bookHandler.getBooksByUser(req.user, (err, results) => {
@@ -59,5 +83,23 @@ module.exports = function (app, appEnv) {
           );
         res.json(result);
       });
+    });
+
+  app.route('/books/:userBook([a-fA-F0-9]{24})/remove')
+    .delete(appEnv.middleware.isLoggedIn, (req, res, next) => {
+      console.log("in route remove book from user");
+      res.json(req.userBook)
+    });
+
+  app.route('/books/:userBook([a-fA-F0-9]{24})/hide')
+    .get(appEnv.middleware.isLoggedIn, (req, res, next) => {
+      console.log("in route hide book to other users");
+      res.json(req.userBook)
+    });
+
+  app.route('/books/:userBook([a-fA-F0-9]{24})/request')
+    .post(appEnv.middleware.isLoggedIn, (req, res, next) => {
+      console.log("in route request book");
+      res.json(req.userBook)
     });
 }

@@ -1,7 +1,11 @@
 extends skeleton.pug
 
+block append html_js
+  script(src="/public/js/modernizr.js")
+
 block append css
   link(href='/public/css/mybooks.css', rel='stylesheet', type='text/css')
+  link(href='/public/css/books.css', rel='stylesheet', type="text/css")
 
 block content
   header.row
@@ -18,4 +22,4 @@ block content
     include book.pug
 
 block append js
-  script(src="/controllers/book.client.js")
+  script(type="text/javascript", src="/controllers/book.client.js")

@@ -5,7 +5,7 @@ function stateHandler (states = [], defaultStatePosition=0) {
   this.defaultStatePosition = defaultStatePosition,
 
   this.stateStringToNumber = (stateString) => {
-    console.log("statesHnadler: in string to numeber");
+    console.log("statesHandler: in string to numeber");
 
     stateString = stateString.trim().toLowerCase();
     let stateNumber = this.states.indexOf(stateString);
