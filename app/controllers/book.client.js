@@ -81,17 +81,20 @@
   //**************** ACTIONS FOR BOOK USER ***********************
 
   let classesBookAction = document.getElementsByClassName('bookAction');
+  let urlBook = appUrl + '/books';
 
   let onBooksActionClick = e => {
     if (e.target && e.target.nodeName === "BUTTON") {
       let buttonClicked = e.target;
-      buttonClicked.disabled = true;
       let userBookId = buttonClicked.parentElement.getElementsByTagName('INPUT')[0].value
       let buttonValue = buttonClicked.value;
 
-      if (buttonValue == 'remove') return removeUserBook(userBookId);
-      if (buttonValue == 'toggleRequestable') return toggleRequestableUserBook(userBookId);
-      if (buttonValue == 'request') return requestUserBook(userBookId);
+      if (buttonValue == 'remove')
+        return onRemoveUserBook(userBookId);
+      if (buttonValue == 'toggleRequestable')
+        return onToggleRequestableUserBook(userBookId);
+      if (buttonValue == 'request')
+        return onRequestUserBook(userBookId);
     }
     e.stopPropagation();
   }
@@ -99,28 +102,47 @@
   for (let i=0; i<classesBookAction.length; i++)
     classesBookAction[i].addEventListener('click', onBooksActionClick, false);
 
+  let onDataReceived = (callback) => {
+    return (err, data) => {
+      if (err) return errorHandler.onError(err);
+      data = JSON.parse(data);
+      if (data.message) return errorHandler.onMessage(data.message);
+      return callback(data);
+    }
+  }
   //**************** END ACTIONS FOR BOOK USER ****************
 
   //**************** REMOVE BOOK USER ***********************
-
-  function removeUserBook(bookUserId){
+  function onRemoveUserBook(bookUserId){
     console.log("on remove user book", bookUserId);
+    let url = urlBook + '/' + bookUserId + '/remove';
+    ajaxFunctions.ajaxRequest('DELETE', url, null, onDataReceived((removed) => {
+      console.log(removed);
+    }))
   }
 
   //**************** END REMOVE BOOK USER ***********************
 
   //**************** SET BOOK USER AVAILABLE OR NOT *************
 
-  function toggleRequestableUserBook(bookUserId){
+  function onToggleRequestableUserBook(bookUserId){
     console.log("on toggle Requestable user book", bookUserId);
+    let url = urlBook + '/' + bookUserId + '/toggleRequestable';
+    ajaxFunctions.ajaxRequest('GET', url, null, onDataReceived((toggled) => {
+      console.log(toggled);
+    }))
   }
 
   //*********** END SET BOOK USER AVAILABLE OR NOT *************
 
   //******************* REQUEST BOOK USER **********************
 
-  function requestUserBook(bookUserId){
+  function onRequestUserBook(bookUserId){
     console.log("on request user book", bookUserId);
+    let url = urlBook + '/' + bookUserId + '/request';
+    ajaxFunctions.ajaxRequest('POST', url, null, onDataReceived((requested) => {
+      console.log(requested);
+    }))
   }
 
   //****************** END REQUEST BOOK USER ********************

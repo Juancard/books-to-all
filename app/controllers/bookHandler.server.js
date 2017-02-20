@@ -94,6 +94,14 @@ function bookHandler () {
           })
         })
       });
+  },
+
+  this.getUserBookById = (bookUserId, callback) => {
+    console.log("in bd handler get user book by id ", bookUserId);
+    UserBook.findById(bookUserId).exec((err, userBookFound) => {
+      if (err) return callback(err);
+      callback(false, userBookFound);
+    });
   }
 
 }

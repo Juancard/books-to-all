@@ -12,7 +12,7 @@ module.exports = function (app, appEnv) {
     console.log("Requested userBook id: ", userBookId);
 
     // ... VALIDATE USERBOOK ID
-    pollHandler.getUserBookById(userBookId, function(err, userBook){
+    bookHandler.getUserBookById(userBookId, function(err, userBook){
       if (err)
         return next(
           new appEnv.errors.InternalError(
@@ -20,7 +20,7 @@ module.exports = function (app, appEnv) {
             "Error in retrieving the requested user's book"
           )
         );
-      if (!req.userBook)
+      if (!userBook)
         return next(
           new appEnv.errors.NotFound(
             "The resource requested is not available"
@@ -91,7 +91,7 @@ module.exports = function (app, appEnv) {
       res.json(req.userBook)
     });
 
-  app.route('/books/:userBook([a-fA-F0-9]{24})/hide')
+  app.route('/books/:userBook([a-fA-F0-9]{24})/toggleRequestable')
     .get(appEnv.middleware.isLoggedIn, (req, res, next) => {
       console.log("in route hide book to other users");
       res.json(req.userBook)
