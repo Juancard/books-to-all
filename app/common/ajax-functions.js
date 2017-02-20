@@ -36,5 +36,14 @@ var ajaxFunctions = {
       } else {
         xmlhttp.send();
       }
+   },
+
+   onDataReceived: function onDataReceived(callback){
+     return (err, data) => {
+       if (err) return errorHandler.onError(err);
+       data = JSON.parse(data);
+       if (data.message) return errorHandler.onMessage(data.message);
+       return callback(data);
+     }
    }
 };

@@ -102,23 +102,19 @@
   for (let i=0; i<classesBookAction.length; i++)
     classesBookAction[i].addEventListener('click', onBooksActionClick, false);
 
-  let onDataReceived = (callback) => {
-    return (err, data) => {
-      if (err) return errorHandler.onError(err);
-      data = JSON.parse(data);
-      if (data.message) return errorHandler.onMessage(data.message);
-      return callback(data);
-    }
-  }
   //**************** END ACTIONS FOR BOOK USER ****************
 
   //**************** REMOVE BOOK USER ***********************
   function onRemoveUserBook(bookUserId){
     console.log("on remove user book", bookUserId);
     let url = urlBook + '/' + bookUserId + '/remove';
-    ajaxFunctions.ajaxRequest('DELETE', url, null, onDataReceived((removed) => {
-      console.log(removed);
-    }))
+    ajaxFunctions.ajaxRequest('DELETE', url,
+      null, ajaxFunctions.onDataReceived(
+        (removed) => {
+          console.log(removed);
+        }
+      )
+    )
   }
 
   //**************** END REMOVE BOOK USER ***********************
@@ -128,7 +124,7 @@
   function onToggleRequestableUserBook(bookUserId){
     console.log("on toggle Requestable user book", bookUserId);
     let url = urlBook + '/' + bookUserId + '/toggleRequestable';
-    ajaxFunctions.ajaxRequest('GET', url, null, onDataReceived((toggled) => {
+    ajaxFunctions.ajaxRequest('GET', url, null, ajaxFunctions.onDataReceived((toggled) => {
       console.log(toggled);
     }))
   }
@@ -140,7 +136,7 @@
   function onRequestUserBook(bookUserId){
     console.log("on request user book", bookUserId);
     let url = urlBook + '/' + bookUserId + '/request';
-    ajaxFunctions.ajaxRequest('POST', url, null, onDataReceived((requested) => {
+    ajaxFunctions.ajaxRequest('POST', url, null, ajaxFunctions.onDataReceived((requested) => {
       console.log(requested);
     }))
   }
