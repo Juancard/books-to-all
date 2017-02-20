@@ -40,10 +40,13 @@ var ajaxFunctions = {
 
    onDataReceived: function onDataReceived(callback){
      return (err, data) => {
-       if (err) return errorHandler.onError(err);
+       if (err) {
+         errorHandler.onError(err);
+         return callback(err);
+       }
        data = JSON.parse(data);
-       if (data.message) return errorHandler.onMessage(data.message);
-       return callback(data);
+       if (data.message) errorHandler.onMessage(data.message);
+       return callback(false, data.results);
      }
    }
 };

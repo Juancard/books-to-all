@@ -13,6 +13,6 @@ module.exports = function(req, res, next) {
           text: 'Log in first to perform this action'
         }
       });
-    res.redirect("/");
+    res.redirect("/login");
   }
 }

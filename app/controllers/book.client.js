@@ -19,17 +19,28 @@
       btnSubmitBook.disabled = true;
       let url = urlSearchBooks + '?field=all&q=' + e.target.book.value;
 
-      ajaxFunctions.ajaxRequest('GET', url, null, (err, data) => {
-        btnSubmitBook.disabled = false;
-        if (err) return errorHandler.onError(err);
-        data = JSON.parse(data);
-        let books = data.results.work;
-        if (!books) return console.log("No books");
-
-        // HARDCODE: CHOOSE BOOK ARBITRARIALY
-        let bookChosen = books[0];
-        addToUserBooks(bookChosen)
-      });
+      ajaxFunctions.ajaxRequest(
+        'GET',
+        url,
+        null,
+        ajaxFunctions.onDataReceived(
+          (err, searchResults) => {
+            btnSubmitBook.disabled = false;
+            if (!searchResults) return;
+            let books = searchResults.work;
+            if (!books)
+              return errorHandler.onMessage({
+                message: {
+                  type: 'info',
+                  text: 'No Books found'
+                }
+              });
+            // HARDCODE: CHOOSE BOOK ARBITRARIALY
+            let bookChosen = books[0];
+            addToUserBooks(bookChosen)
+          }
+        )
+      );
     }
     formAddBook.addEventListener('submit', onAddBook);
 
@@ -39,13 +50,16 @@
     let out = {
       book: bookChosen
     }
-    ajaxFunctions.ajaxRequest('POST', urlAddBook, out, (err, data) => {
-      if (err) return errorHandler.onError(err);
-      data = JSON.parse(data);
-      if (data.message) return errorHandler.onMessage(data.message);
-      console.log(data);
-      addBookElement(data);
-    })
+    ajaxFunctions.ajaxRequest(
+      'POST',
+      urlAddBook,
+      out,
+      ajaxFunctions.onDataReceived(
+        (err, data) => {
+          if (data) return addBookElement(data)
+        }
+      )
+    );
   }
 
   //**************** END ADD BOOK ***********************
@@ -56,6 +70,9 @@
   const bookContainer = document.getElementsByClassName('books')[0].firstChild;
 
   function addBookElement(userBook){
+    let toClear = document.getElementById('noBooks');
+    toClear.outerHTML = '';
+
     let newBookElement = bookTemplate.cloneNode(true);
 
     let classBook = newBookElement.getElementsByClassName('book')[0];
@@ -110,7 +127,8 @@
     let url = urlBook + '/' + bookUserId + '/remove';
     ajaxFunctions.ajaxRequest('DELETE', url,
       null, ajaxFunctions.onDataReceived(
-        (removed) => {
+        (err, removed) => {
+          if (!removed) return;
           console.log(removed);
         }
       )
@@ -124,7 +142,8 @@
   function onToggleRequestableUserBook(bookUserId){
     console.log("on toggle Requestable user book", bookUserId);
     let url = urlBook + '/' + bookUserId + '/toggleRequestable';
-    ajaxFunctions.ajaxRequest('GET', url, null, ajaxFunctions.onDataReceived((toggled) => {
+    ajaxFunctions.ajaxRequest('GET', url, null, ajaxFunctions.onDataReceived((err, toggled) => {
+      if (!toggled) return;
       console.log(toggled);
     }))
   }
@@ -136,7 +155,8 @@
   function onRequestUserBook(bookUserId){
     console.log("on request user book", bookUserId);
     let url = urlBook + '/' + bookUserId + '/request';
-    ajaxFunctions.ajaxRequest('POST', url, null, ajaxFunctions.onDataReceived((requested) => {
+    ajaxFunctions.ajaxRequest('POST', url, null, ajaxFunctions.onDataReceived((err, requested) => {
+      if (!requested) return;
       console.log(requested);
     }))
   }

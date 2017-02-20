@@ -68,7 +68,7 @@ function bookHandler () {
           return callback(false, {
             message: {
               type: 'danger',
-              text: 'Sorry: Book \"' + book.title + '\" is not aloud in our website.'
+              text: 'Book \"' + book.title + '\" is not aloud in our website.'
             }
           })
         book.save((err, result) => {
@@ -90,7 +90,7 @@ function bookHandler () {
                 )
               );
             result.book = book;
-            return callback(false, result);
+            return callback(false, {results: result});
           })
         })
       });
@@ -102,6 +102,34 @@ function bookHandler () {
       if (err) return callback(err);
       callback(false, userBookFound);
     });
+  },
+
+  this.removeUserBook = (user, userBook, callback) => {
+    console.log("in bd handler removing book of ", userBook.user, " from user ", user._id);
+
+    if (!user._id.equals(userBook.user)) {
+      return callback(false, {
+        message: {
+          type: "danger",
+          text: "Only the owner of the book can remove it."
+        }
+      });
+    }
+
+    console.log("State of book: ", userBook.state);
+    if (userBook.state == 'traded') {
+      return callback(false, {
+        message: {
+          type: "danger",
+          text: "Traded books can not be removed."
+        }
+      });
+    }
+
+    // Let's remove it
+    // SET ALL PENDING REQUESTS TO DENIED
+
+    callback(false, {results: userBook})
   }
 
 }

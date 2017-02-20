@@ -88,7 +88,16 @@ module.exports = function (app, appEnv) {
   app.route('/books/:userBook([a-fA-F0-9]{24})/remove')
     .delete(appEnv.middleware.isLoggedIn, (req, res, next) => {
       console.log("in route remove book from user");
-      res.json(req.userBook)
+      bookHandler.removeUserBook(req.user, req.userBook, (err, data) => {
+        if (err)
+          return next(
+            new appEnv.errors.InternalError(
+              err,
+              "Error in removing book"
+            )
+          )
+        res.json(data);
+      });
     });
 
   app.route('/books/:userBook([a-fA-F0-9]{24})/toggleRequestable')

@@ -20,6 +20,10 @@ block content
                 span.glyphicon.glyphicon-search
   .container
     include book.pug
-
+    -let booksLength = books.length
+    if books.length <= 0
+      #noBooks.jumbotron.jumbotron-fluid
+        h3.display-3.text-muted.text-center No books added
+        
 block append js
   script(type="text/javascript", src="/controllers/book.client.js")
