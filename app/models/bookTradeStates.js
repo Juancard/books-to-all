@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 const StateHandler = require('../controllers/stateHandler.db.js')
-const STATES = ['pending', 'accepted', 'denied', 'finished'];
+const STATES = ['pending', 'canceled', 'denied', 'accepted', 'finished'];
 const DEFAULT_STATE_NUMBER = 0
 const stateHandler = new StateHandler(STATES, DEFAULT_STATE_NUMBER);
 

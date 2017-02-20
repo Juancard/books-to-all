@@ -4,7 +4,7 @@ var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 const StateHandler = require('../controllers/stateHandler.db.js')
-const STATES = ['inactive', 'active'];
+const STATES = ['inactive', 'available', 'traded', 'unavailable'];
 const DEFAULT_STATE_NUMBER = 0
 const stateHandler = new StateHandler(STATES, DEFAULT_STATE_NUMBER);
 
@@ -43,7 +43,7 @@ UserBook.index({ book: 1, user: 1, dateAdded: -1}, { unique: true });
 
 UserBook.statics
   .newInstance = function newInstance(book, user, imageUrl=null,
-    state='active') {
+    state='available') {
   let newBookUser = new this();
 
 	newBookUser.book = book;

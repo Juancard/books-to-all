@@ -22,7 +22,7 @@ function bookHandler () {
   },
   this.getBooksByUser = (user, callback) => {
     console.log("Searching books in bd by user:", user.id);
-    let stateNumber = UserBook.getStateNumber('active');
+    let stateNumber = UserBook.getStateNumber('available');
     UserBook
       .find({
         user: user.id,
