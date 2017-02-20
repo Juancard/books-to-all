@@ -38,7 +38,7 @@ module.exports = function (app, appEnv) {
         res.json({
           message: {
             type: 'success',
-            value: 'Updated!'
+            text: 'Updated!'
           }
         })
       })
@@ -51,8 +51,8 @@ module.exports = function (app, appEnv) {
         (err, result) => {
           res.json({
             message: {
-              type: (err)? 'error' : 'success',
-              value: (err)? err.message : 'Updated!'
+              type: (err)? 'danger' : 'success',
+              text: (err)? err.message : 'Updated!'
             }
           });
       });

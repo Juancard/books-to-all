@@ -40,17 +40,18 @@ body {
 /**************************
   GENERAL ERROR MESSAGE
 ****************************/
-#generalErrorMessage {
+.messageOnScreen {
   position: fixed;
-  top: 0;
-  right: 0;
-  margin: 10px;
-  display: none;
+  top: 15px;
+  right: 15px;
+  z-index: 5;
 }
-#generalErrorMessage button{
+/*
+.messageOnScreen button{
   color: #D8000C;
   background-color: #FFBABA;
 }
+*/
 /**************************
   FOOTER
 ****************************/
@@ -111,5 +112,8 @@ footer p {
    .fa {
      font-size: 2.5em !important;
    }
-
+   .messageOnScreen {
+     left: 15px;
+     text-align: center;
+   }
 }

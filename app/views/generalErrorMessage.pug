@@ -1,9 +1,0 @@
-#generalErrorMessage
-  button(tab-index='-1').alert.alert-danger
-    span.glyphicon.glyphicon-remove
-    |  Error 500: Internal Server Error
-script.
-  let btnErrorMessage = document.getElementById('generalErrorMessage')
-  btnErrorMessage.addEventListener('click', e => {
-    btnErrorMessage.style.display = 'none';
-  });

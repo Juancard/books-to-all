@@ -60,7 +60,7 @@
     span.className = "glyphicon glyphicon-" + ( (isSuccess)? 'ok' : 'remove')
 
     // message is setted into a text element
-    let text = document.createTextNode(" " + message.value);
+    let text = document.createTextNode(" " + message.text);
 
     // now element has the message inside
     element.appendChild(span);

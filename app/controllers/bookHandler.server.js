@@ -63,7 +63,14 @@ function bookHandler () {
             bookJson.goodreadsId, bookJson.imageUrl,
             bookJson.publicationYear);
         }
-        console.log("book before saveing: ", book);
+        console.log("book before saving: ", book);
+        if (book.state == 'inactive')
+          return callback(false, {
+            message: {
+              type: 'danger',
+              text: 'Sorry: Book \"' + book.title + '\" is not aloud in our website.'
+            }
+          })
         book.save((err, result) => {
           if (err)
             return callback(
@@ -72,7 +79,6 @@ function bookHandler () {
                 "Could not save book in database"
               )
             );
-
           // Create new copy of book for the user
           let newUserBook = UserBook.newInstance(result.id, user.id);
           newUserBook.save((err, result) => {

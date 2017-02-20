@@ -7,13 +7,12 @@
   });
 
   //**************** ADD BOOK ***********************
-
+  let urlSearchBooks = appUrl + '/books/search';
+  let urlAddBook = appUrl + '/books/add';
   let formAddBook = document.forms['addBookForm'] || null;
+
   if (formAddBook) {
     let btnSubmitBook = formAddBook.getElementsByTagName('BUTTON')[0];
-
-    let urlSearchBooks = appUrl + '/books/search';
-    let urlAddBook = appUrl + '/books/add';
 
     let onAddBook = e => {
       e.preventDefault();
@@ -32,6 +31,8 @@
         addToUserBooks(bookChosen)
       });
     }
+    formAddBook.addEventListener('submit', onAddBook);
+
   }
 
   function addToUserBooks(bookChosen){
@@ -41,6 +42,7 @@
     ajaxFunctions.ajaxRequest('POST', urlAddBook, out, (err, data) => {
       if (err) return errorHandler.onError(err);
       data = JSON.parse(data);
+      if (data.message) return errorHandler.onMessage(data.message);
       console.log(data);
       addBookElement(data);
     })
