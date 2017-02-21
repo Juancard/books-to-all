@@ -4,6 +4,7 @@ var Book = require('../models/books.js');
 var UserBook = require('../models/userBooks.js');
 var UserBookState = require('../models/userBookStates.js');
 var BookTrade = require('../models/bookTrades.js');
+var BookTradeState = require('../models/bookTradeStates.js');
 var User = require('../models/users.js');
 var http_verror = require('http-verror');
 
@@ -84,26 +85,28 @@ function bookHandler () {
             );
           // Create new copy of book for the user
           let newUserBookState = UserBookState.newInstance('available');
-          newUserBookState.save((err, userBookState) => {
+          let newUserBook = UserBook.newInstance(result.id, user.id, newUserBookState.id);
+          newUserBook.save((err, userBook) => {
             if (err)
               return callback(
                 new http_verror.InternalError(
                   err,
-                  "Could not save the state of the new book in database"
+                  "Could not add book to user in database"
                 )
               );
-            let newUserBook = UserBook.newInstance(result.id, user.id, userBookState.id);
-            newUserBook.save((err, result) => {
+            newUserBookState.userBook = userBook.id;
+            newUserBookState.save((err, userBookState) => {
               if (err)
                 return callback(
                   new http_verror.InternalError(
                     err,
-                    "Could not add book to user in database"
+                    "Could not save the state of the new book in database"
                   )
                 );
-              result.book = book;
-              result.state = userBookState;
-              return callback(false, {results: result});
+              // populate before returning userBook to user
+              userBook.book = book;
+              userBook.state = userBookState;
+              return callback(false, {results: userBook});
             });
           });
         });
@@ -112,9 +115,12 @@ function bookHandler () {
 
   this.getUserBookById = (bookUserId, callback) => {
     console.log("in bd handler get user book by id ", bookUserId);
-    UserBook.findById(bookUserId).exec((err, userBookFound) => {
-      if (err) return callback(err);
-      callback(false, userBookFound);
+    UserBook
+      .findById(bookUserId)
+      .populate("state")
+      .exec((err, userBookFound) => {
+        if (err) return callback(err);
+        callback(false, userBookFound);
     });
   },
 
@@ -131,19 +137,90 @@ function bookHandler () {
     }
 
     console.log("State of book: ", userBook.state);
-    if (userBook.state == 'traded') {
+    if (userBook.state.state == 'traded') {
       return callback(false, {
         message: {
           type: "danger",
           text: "Traded books can not be removed."
         }
       });
+    } else if (userBook.state.state == 'inactive') {
+      return callback(false, {
+        message: {
+          type: "danger",
+          text: "Book has already been removed."
+        }
+      });
     }
 
     // Let's remove it
     // SET ALL PENDING REQUESTS TO DENIED
+    BookTrade
+      .find({'userBook': userBook.id})
+      .populate('state')
+      .exec((err, trades) => {
+        if (err)
+          return callback(
+            new http_verror.InternalError(
+              err,
+              "Could not retrieve trades of this book"
+            )
+          );
+        trades.forEach((trade) => {
+          if (trade.state.state == 'pending'){
+            let newState = BookTradeState.newInstance('denied', trade.id);
+            newState.save((err, state) => {
+              if (err)
+              return callback(
+                new http_verror.InternalError(
+                  err,
+                  "Could not change state from pending to denied for request %s",
+                  String(trade.id)
+                )
+              );
+              trade.state = state.id;
+              trade.save((err, tradeSaved) => {
+                if (err)
+                  return callback(
+                    new http_verror.InternalError(
+                      err,
+                      "Could not save request %s after changing its state to denied",
+                      String(trade.id)
+                    )
+                  );
+                //Trade saved succesfully
+                console.log("Trade saved succesfully: ", tradeSaved.id);
+              });
+              //end of new state saving
+            });
+            // end of if state==pending
+          }
+          // end of trade.forEach
+        });
 
-    callback(false, {results: userBook})
+        // FInally change state of book to 'inactive'
+        let newUserBookState = UserBookState.newInstance('inactive', userBook.id);
+        newUserBookState.save((err, userBookState) => {
+          if (err)
+            return callback(
+              new http_verror.InternalError(
+                err,
+                "Could not save the new state of the user's book"
+              )
+            );
+          userBook.state = userBookState.id;
+          userBook.save((err, userBookSaved) => {
+            if (err)
+              return callback(
+                new http_verror.InternalError(
+                  err,
+                  "Could not remove the book"
+                )
+              );
+            callback(false, {results: userBookSaved});
+          })
+        });
+      })
   }
 
 }

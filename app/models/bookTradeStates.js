@@ -29,7 +29,7 @@ var BookTradeState = new Schema({
 	},
 });
 
-UserBook.set('toObject', { getters: true });
+BookTradeState.set('toObject', { getters: true });
 BookTradeState.index({ bookTrade: 1, date: -1}, { unique: true });
 
 BookTradeState.statics
