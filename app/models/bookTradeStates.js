@@ -29,10 +29,11 @@ var BookTradeState = new Schema({
 	},
 });
 
+UserBook.set('toObject', { getters: true });
 BookTradeState.index({ bookTrade: 1, date: -1}, { unique: true });
 
 BookTradeState.statics
-  .newInstance = function newInstance(bookTrade, state='pending') {
+  .newInstance = function newInstance(state='pending', bookTrade=null) {
   let newBookTradeState = new this();
 
 	newBookTradeState.bookTrade = bookTrade;
@@ -41,6 +42,6 @@ BookTradeState.statics
   return newBookTradeState;
 }
 
-Book.statics.getStateNumber = stateHandler.stateStringToNumber;
+BookTradeState.statics.getStateNumber = stateHandler.stateStringToNumber;
 
 module.exports = mongoose.model('BookTradeState', BookTradeState);

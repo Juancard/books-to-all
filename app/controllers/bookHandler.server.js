@@ -2,6 +2,7 @@
 
 var Book = require('../models/books.js');
 var UserBook = require('../models/userBooks.js');
+var UserBookState = require('../models/userBookStates.js');
 var BookTrade = require('../models/bookTrades.js');
 var User = require('../models/users.js');
 var http_verror = require('http-verror');
@@ -22,15 +23,14 @@ function bookHandler () {
   },
   this.getBooksByUser = (user, callback) => {
     console.log("Searching books in bd by user:", user.id);
-    let stateNumber = UserBook.getStateNumber('available');
     UserBook
       .find({
-        user: user.id,
-        state: stateNumber
+        user: user.id
       })
       .sort({ dateAdded: -1 })
       .populate('book')
-      .exec( (err, results) => {
+      .populate('state')
+      .exec( (err, booksFound) => {
         if (err)
           return callback(
             new http_verror.InternalError(
@@ -38,8 +38,11 @@ function bookHandler () {
               "Could not retrieve user's active books by user Id"
             )
           );
-        callback(false, results);
-      })
+        let books = booksFound.filter(
+          (book) => book.state.state != 'inactive'
+        );
+        callback(false, books);
+      });
   },
   this.addBookToUser = (user, bookJson, callback) => {
     console.log("in bd handler add book to user");
@@ -80,19 +83,30 @@ function bookHandler () {
               )
             );
           // Create new copy of book for the user
-          let newUserBook = UserBook.newInstance(result.id, user.id);
-          newUserBook.save((err, result) => {
+          let newUserBookState = UserBookState.newInstance('available');
+          newUserBookState.save((err, userBookState) => {
             if (err)
               return callback(
                 new http_verror.InternalError(
                   err,
-                  "Could not add book to user in database"
+                  "Could not save the state of the new book in database"
                 )
               );
-            result.book = book;
-            return callback(false, {results: result});
-          })
-        })
+            let newUserBook = UserBook.newInstance(result.id, user.id, userBookState.id);
+            newUserBook.save((err, result) => {
+              if (err)
+                return callback(
+                  new http_verror.InternalError(
+                    err,
+                    "Could not add book to user in database"
+                  )
+                );
+              result.book = book;
+              result.state = userBookState;
+              return callback(false, {results: result});
+            });
+          });
+        });
       });
   },
 
