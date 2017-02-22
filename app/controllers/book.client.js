@@ -71,7 +71,7 @@
 
   function addBookElement(userBook){
     let toClear = document.getElementById('noBooks');
-    toClear.outerHTML = '';
+    if (toClear) toClear.outerHTML = '';
 
     let newBookElement = bookTemplate.cloneNode(true);
 
@@ -106,12 +106,19 @@
       let userBookId = buttonClicked.parentElement.getElementsByTagName('INPUT')[0].value
       let buttonValue = buttonClicked.value;
 
+      console.log("click on book");
+      buttonClicked.disabled = true;
+      let callback = () => {
+        console.log("enable book again");
+        buttonClicked.disabled = false;
+      }
+
       if (buttonValue == 'remove')
-        return onRemoveUserBook(userBookId);
+        return onRemoveUserBook(userBookId, callback);
       if (buttonValue == 'toggleRequestable')
-        return onToggleRequestableUserBook(userBookId);
+        return onToggleRequestableUserBook(userBookId, callback);
       if (buttonValue == 'request')
-        return onRequestUserBook(userBookId);
+        return onRequestUserBook(userBookId, callback);
     }
     e.stopPropagation();
   }
@@ -122,14 +129,15 @@
   //**************** END ACTIONS FOR BOOK USER ****************
 
   //**************** REMOVE BOOK USER ***********************
-  function onRemoveUserBook(bookUserId){
+  function onRemoveUserBook(bookUserId, callback){
     console.log("on remove user book", bookUserId);
     let url = urlBook + '/' + bookUserId + '/remove';
     ajaxFunctions.ajaxRequest('DELETE', url,
       null, ajaxFunctions.onDataReceived(
         (err, removed) => {
-          if (!removed) return;
-          console.log(removed);
+          if (removed)
+            document.getElementById(removed._id).outerHTML = ''
+          return callback();
         }
       )
     )
@@ -139,12 +147,22 @@
 
   //**************** SET BOOK USER AVAILABLE OR NOT *************
 
-  function onToggleRequestableUserBook(bookUserId){
+  function onToggleRequestableUserBook(bookUserId, callback){
     console.log("on toggle Requestable user book", bookUserId);
     let url = urlBook + '/' + bookUserId + '/toggleRequestable';
     ajaxFunctions.ajaxRequest('GET', url, null, ajaxFunctions.onDataReceived((err, toggled) => {
-      if (!toggled) return;
-      console.log(toggled);
+      if (toggled) {
+        let bookElement = document.getElementById(toggled._id)
+        let buttons = bookElement.getElementsByTagName('BUTTON');
+        for (let i=0; i<buttons.length; i++){
+          if (buttons[i].value == 'toggleRequestable'){
+            console.log(toggled);
+            //HARDCODE: SHOULD ASK FOR STATE STRING 'UNAVAILABLE', NOT STATE NUMBER 3
+            buttons[i].textContent = (toggled.state.state != 3)? "Accepts trades" : "No trades Accepted";
+          }
+        }
+      }
+      callback();
     }))
   }
 
@@ -152,12 +170,14 @@
 
   //******************* REQUEST BOOK USER **********************
 
-  function onRequestUserBook(bookUserId){
+  function onRequestUserBook(bookUserId, callback){
     console.log("on request user book", bookUserId);
     let url = urlBook + '/' + bookUserId + '/request';
     ajaxFunctions.ajaxRequest('POST', url, null, ajaxFunctions.onDataReceived((err, requested) => {
-      if (!requested) return;
-      console.log(requested);
+      if (requested) {
+        console.log(requested);
+      }
+      callback();
     }))
   }
 

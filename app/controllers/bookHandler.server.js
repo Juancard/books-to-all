@@ -118,9 +118,90 @@ function bookHandler () {
     UserBook
       .findById(bookUserId)
       .populate("state")
+      .populate("book")
       .exec((err, userBookFound) => {
         if (err) return callback(err);
         callback(false, userBookFound);
+    });
+  },
+
+  this.setUserBookStateTo = (userBook, newState, callback) => {
+    let newStateObject = UserBookState.newInstance(newState, userBook.id);
+    newStateObject.save((err, state) => {
+      if (err)
+        return callback(
+          new http_verror.InternalError(
+            err,
+            "Could not change state to %s for user's book %s",
+            newState,
+            String(userBook.id)
+          )
+        );
+      userBook.state = state.id;
+      callback(false, userBook, newStateObject);
+    });
+  },
+
+  this.setTradeStateTo = (trade, newState, callback) => {
+    let newStateObject = BookTradeState.newInstance(newState, trade.id);
+    newStateObject.save((err, state) => {
+      if (err)
+        return callback(
+          new http_verror.InternalError(
+            err,
+            "Could not change state to %s for trade %s",
+            newState,
+            String(trade.id)
+          )
+        );
+      trade.state = state.id;
+      callback(false, trade, newStateObject);
+    });
+  },
+
+  this.setUserBookTradesState = (userBook, fromState, toState, callback) => {
+    BookTrade
+      .find({'userBook': userBook.id})
+      .populate('state')
+      .exec((err, trades) => {
+        if (err)
+          return callback(
+            new http_verror.InternalError(
+              err,
+              "Could not retrieve trades of this book"
+            )
+          );
+        trades.forEach((trade) => {
+          if (trade.state.state == fromState){
+            this.setTradeStateTo(trade, toState, (err, trade, newState) => {
+              if (err)
+                return callback(
+                  new http_verror.InternalError(
+                    err,
+                    "Fail on setting new trade's state",
+                    String(trade.id),
+                    toState
+                  )
+                );
+              trade.save((err, tradeSaved) => {
+                if (err)
+                  return callback(
+                    new http_verror.InternalError(
+                      err,
+                      "Could not save trade %s after changing its state to %s",
+                      String(trade.id),
+                      toState
+                    )
+                  );
+                //Trade saved succesfully
+                console.log("Trade saved succesfully: ", tradeSaved.id);
+              });
+            });
+            // end of if state==pending
+          }
+          // end of trade.forEach
+        });
+      callback(false, userBook);
     });
   },
 
@@ -144,83 +225,96 @@ function bookHandler () {
           text: "Traded books can not be removed."
         }
       });
-    } else if (userBook.state.state == 'inactive') {
-      return callback(false, {
-        message: {
-          type: "danger",
-          text: "Book has already been removed."
-        }
-      });
     }
 
     // Let's remove it
     // SET ALL PENDING REQUESTS TO DENIED
-    BookTrade
-      .find({'userBook': userBook.id})
-      .populate('state')
-      .exec((err, trades) => {
-        if (err)
-          return callback(
-            new http_verror.InternalError(
-              err,
-              "Could not retrieve trades of this book"
-            )
-          );
-        trades.forEach((trade) => {
-          if (trade.state.state == 'pending'){
-            let newState = BookTradeState.newInstance('denied', trade.id);
-            newState.save((err, state) => {
-              if (err)
-              return callback(
-                new http_verror.InternalError(
-                  err,
-                  "Could not change state from pending to denied for request %s",
-                  String(trade.id)
-                )
-              );
-              trade.state = state.id;
-              trade.save((err, tradeSaved) => {
-                if (err)
-                  return callback(
-                    new http_verror.InternalError(
-                      err,
-                      "Could not save request %s after changing its state to denied",
-                      String(trade.id)
-                    )
-                  );
-                //Trade saved succesfully
-                console.log("Trade saved succesfully: ", tradeSaved.id);
-              });
-              //end of new state saving
-            });
-            // end of if state==pending
-          }
-          // end of trade.forEach
-        });
-
-        // FInally change state of book to 'inactive'
-        let newUserBookState = UserBookState.newInstance('inactive', userBook.id);
-        newUserBookState.save((err, userBookState) => {
+    this.setUserBookTradesState(userBook, 'pending', 'denied', (err, result) => {
+      if (err)
+        return callback(
+          new http_verror.InternalError(
+            err,
+            "Fail on changing state of trades from this user's book"
+          )
+        );
+      // FInally change state of book to 'inactive'
+      this.setUserBookStateTo(userBook, 'inactive', (err, userBook, newState) =>{
+        if (err) callback(err);
+        userBook.save((err, userBookSaved) => {
           if (err)
             return callback(
               new http_verror.InternalError(
                 err,
-                "Could not save the new state of the user's book"
+                "Could not remove the book"
               )
             );
-          userBook.state = userBookState.id;
-          userBook.save((err, userBookSaved) => {
-            if (err)
-              return callback(
-                new http_verror.InternalError(
-                  err,
-                  "Could not remove the book"
-                )
-              );
-            callback(false, {results: userBookSaved});
-          })
+          userBookSaved.state = newState;
+          callback(false, {
+            results: userBookSaved,
+            message: {
+              type: 'success',
+              text: 'Succesfully removed ' + userBook.book.title
+            }
+          });
+        });
+      });
+    });
+  },
+
+  this.toggleRequestable = (user, userBook, callback) => {
+    console.log("in bd handler toggle requestable book of ", userBook.user, " from user ", user._id);
+
+    if (!user._id.equals(userBook.user)) {
+      return callback(false, {
+        message: {
+          type: "danger",
+          text: "Only the owner of the book can toggle the state of it."
+        }
+      });
+    }
+
+    console.log("State of book: ", userBook.state);
+    if (userBook.state.state == 'traded') {
+      return callback(false, {
+        message: {
+          type: "danger",
+          text: "Traded books can not be set unavailable."
+        }
+      });
+    }
+
+    let onNewStateCallback = (err, userBook, newState) => {
+      if (err) return callback(err);
+      userBook.save((err, userBookSaved) => {
+        if (err)
+          return callback(
+            new http_verror.InternalError(
+              err,
+              "Could not save user's book with new state %s",
+              newState.state
+            )
+          );
+        userBookSaved.state = newState;
+        return callback(false, {
+          results: userBookSaved
         });
       })
+    }
+
+    if (userBook.state.state == 'available'){
+      this.setUserBookTradesState(userBook, 'pending', 'denied', (err, result) => {
+        if (err)
+          return callback(
+            new http_verror.InternalError(
+              err,
+              "Fail on changing state of trades from this user's book"
+            )
+          );
+        this.setUserBookStateTo(userBook, 'unavailable', onNewStateCallback);
+      });
+    } else {
+      this.setUserBookStateTo(userBook, 'available', onNewStateCallback);
+    }
   }
 
 }

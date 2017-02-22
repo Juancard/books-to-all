@@ -29,6 +29,7 @@ var UserBookState = new Schema({
 });
 
 UserBookState.set('toObject', { getters: true });
+
 UserBookState.index({ userBook: 1, date: -1}, { unique: true });
 
 UserBookState.statics

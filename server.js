@@ -17,7 +17,7 @@ let app = express();
 require('dotenv').load();
 require('./app/config/passport')(passport);
 
-mongoose.connect(process.env.MONGOLAB_URI || process.env.MONGO_URI);
+mongoose.connect(process.env.MONGO_URI || process.env.MONGOLAB_URI);
 mongoose.Promise = global.Promise;
 
 // SETIING UP CLIENT SIDE

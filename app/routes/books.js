@@ -20,7 +20,7 @@ module.exports = function (app, appEnv) {
             "Error in retrieving the requested user's book"
           )
         );
-      if (!userBook)
+      if (!userBook || (userBook && userBook.state.state == 'inactive'))
         return next(
           new appEnv.errors.NotFound(
             "The resource requested is not available"
@@ -102,13 +102,23 @@ module.exports = function (app, appEnv) {
 
   app.route('/books/:userBook([a-fA-F0-9]{24})/toggleRequestable')
     .get(appEnv.middleware.isLoggedIn, (req, res, next) => {
-      console.log("in route hide book to other users");
-      res.json(req.userBook)
+      console.log("in route toggle requestable to other users");
+      bookHandler.toggleRequestable(req.user, req.userBook, (err, data) => {
+        if (err)
+          return next(
+            new appEnv.errors.InternalError(
+              err,
+              "Error in toggle requestable"
+            )
+          )
+        res.json(data);
+      });
     });
 
   app.route('/books/:userBook([a-fA-F0-9]{24})/request')
     .post(appEnv.middleware.isLoggedIn, (req, res, next) => {
       console.log("in route request book");
-      res.json(req.userBook)
+
+      res.json(req.userBook);
     });
 }
