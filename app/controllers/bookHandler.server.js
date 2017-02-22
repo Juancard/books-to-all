@@ -205,29 +205,9 @@ function bookHandler () {
     });
   },
 
-  this.removeUserBook = (user, userBook, callback) => {
-    console.log("in bd handler removing book of ", userBook.user, " from user ", user._id);
+  this.removeUserBook = (userBook, callback) => {
+    console.log("in bd handler removing book of ", userBook.user);
 
-    if (!user._id.equals(userBook.user)) {
-      return callback(false, {
-        message: {
-          type: "danger",
-          text: "Only the owner of the book can remove it."
-        }
-      });
-    }
-
-    console.log("State of book: ", userBook.state);
-    if (userBook.state.state == 'traded') {
-      return callback(false, {
-        message: {
-          type: "danger",
-          text: "Traded books can not be removed."
-        }
-      });
-    }
-
-    // Let's remove it
     // SET ALL PENDING REQUESTS TO DENIED
     this.setUserBookTradesState(userBook, 'pending', 'denied', (err, result) => {
       if (err)
@@ -261,27 +241,8 @@ function bookHandler () {
     });
   },
 
-  this.toggleRequestable = (user, userBook, callback) => {
-    console.log("in bd handler toggle requestable book of ", userBook.user, " from user ", user._id);
-
-    if (!user._id.equals(userBook.user)) {
-      return callback(false, {
-        message: {
-          type: "danger",
-          text: "Only the owner of the book can toggle the state of it."
-        }
-      });
-    }
-
-    console.log("State of book: ", userBook.state);
-    if (userBook.state.state == 'traded') {
-      return callback(false, {
-        message: {
-          type: "danger",
-          text: "Traded books can not be set unavailable."
-        }
-      });
-    }
+  this.toggleRequestable = (userBook, callback) => {
+    console.log("in bd handler toggle requestable book of ", userBook.user);
 
     let onNewStateCallback = (err, userBook, newState) => {
       if (err) return callback(err);

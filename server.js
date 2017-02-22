@@ -59,7 +59,8 @@ app.use(function(req, res, next) {
 let appEnv = {
   path: process.cwd(),
   middleware: {
-    isLoggedIn: require("./middleware/isLoggedIn.js")
+    isLoggedIn: require("./middleware/isLoggedIn.js"),
+		books: require("./middleware/books.js")
   },
   passport,
 	errors,

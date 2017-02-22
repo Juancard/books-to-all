@@ -86,9 +86,11 @@ module.exports = function (app, appEnv) {
     });
 
   app.route('/books/:userBook([a-fA-F0-9]{24})/remove')
-    .delete(appEnv.middleware.isLoggedIn, (req, res, next) => {
+    .delete(appEnv.middleware.isLoggedIn,
+      appEnv.middleware.books.isOwner,
+      (req, res, next) => {
       console.log("in route remove book from user");
-      bookHandler.removeUserBook(req.user, req.userBook, (err, data) => {
+      bookHandler.removeUserBook(req.userBook, (err, data) => {
         if (err)
           return next(
             new appEnv.errors.InternalError(
@@ -101,9 +103,12 @@ module.exports = function (app, appEnv) {
     });
 
   app.route('/books/:userBook([a-fA-F0-9]{24})/toggleRequestable')
-    .get(appEnv.middleware.isLoggedIn, (req, res, next) => {
+    .get(appEnv.middleware.isLoggedIn,
+      appEnv.middleware.books.isOwner,
+      appEnv.middleware.books.isNotTraded,
+      (req, res, next) => {
       console.log("in route toggle requestable to other users");
-      bookHandler.toggleRequestable(req.user, req.userBook, (err, data) => {
+      bookHandler.toggleRequestable(req.userBook, (err, data) => {
         if (err)
           return next(
             new appEnv.errors.InternalError(
@@ -116,7 +121,8 @@ module.exports = function (app, appEnv) {
     });
 
   app.route('/books/:userBook([a-fA-F0-9]{24})/request')
-    .post(appEnv.middleware.isLoggedIn, (req, res, next) => {
+    .post(appEnv.middleware.isLoggedIn,
+      (req, res, next) => {
       console.log("in route request book");
 
       res.json(req.userBook);
