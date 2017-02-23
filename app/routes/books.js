@@ -85,49 +85,50 @@ module.exports = function (app, appEnv) {
     });
 
   app.route('/books/:goodreadsBook/add')
-    .post(appEnv.middleware.isLoggedIn, (req, res, next) => {
-      console.log("in route add book to user");
+    .post(appEnv.middleware.isLoggedIn,
+      (req, res, next) => {
+        console.log("in route add book to user");
 
-      let onError = (err) => {
-        return next(
-          new appEnv.errors.InternalError(
-            err,
-            'Failed to add book to user'
-          )
-        );
-      }
-      let onBookAddedToUser = (err, result) => {
-        if (err) return onError(err);
-        res.json({results: result});
-      };
-
-      //Goodreads Book to add is already in our db?
-      if (!req.book){
-        console.log("Book is not on db, let's create it");
-        // it's not.
-        let bookJson = apiBookHandler.getBookData(req.body.book);
-        bookHandler.newBook(bookJson, (err, book) => {
+        let onError = (err) => {
+          return next(
+            new appEnv.errors.InternalError(
+              err,
+              'Failed to add book to user'
+            )
+          );
+        }
+        let onBookAddedToUser = (err, result) => {
           if (err) return onError(err);
-          return bookHandler.addBookToUser(req.user, book, onBookAddedToUser);
-        });
-      } else {
-        // Book already exists in db
-        console.log("Book is in db, is it inactive?");
-        if (req.book.state == 'inactive')
-          res.json({
-            message: {
-              type: 'danger',
-              text: 'Book \"' + book.title + '\" is not aloud in our website.'
-            }
+          res.json({results: result});
+        };
+
+        //Goodreads Book to add is already in our db?
+        if (!req.book){
+          console.log("Book is not on db, let's create it");
+          // it's not.
+          let bookJson = apiBookHandler.getBookData(req.body.book);
+          bookHandler.newBook(bookJson, (err, book) => {
+            if (err) return onError(err);
+            return bookHandler.addBookToUser(req.user, book, onBookAddedToUser);
           });
-        console.log("Book is not inactive, let's add it to the user");
-        return bookHandler.addBookToUser(req.user, req.book, onBookAddedToUser);
-      }
+        } else {
+          // Book already exists in db
+          console.log("Book is in db, is it inactive?");
+          if (req.book.state == 'inactive')
+            res.json({
+              message: {
+                type: 'danger',
+                text: 'Book \"' + book.title + '\" is not aloud in our website.'
+              }
+            });
+          console.log("Book is not inactive, let's add it to the user");
+          return bookHandler.addBookToUser(req.user, req.book, onBookAddedToUser);
+        }
     });
 
   app.route('/books/:userBook([a-fA-F0-9]{24})/remove')
     .delete(appEnv.middleware.isLoggedIn,
-      appEnv.middleware.books.isOwner,
+      appEnv.middleware.books.isOwner(true),
       (req, res, next) => {
       console.log("in route remove book from user");
       bookHandler.removeUserBook(req.userBook, (err, userBookRemoved) => {
@@ -150,11 +151,11 @@ module.exports = function (app, appEnv) {
 
   app.route('/books/:userBook([a-fA-F0-9]{24})/toggleRequestable')
     .get(appEnv.middleware.isLoggedIn,
-      appEnv.middleware.books.isOwner,
-      appEnv.middleware.books.isNotTraded,
+      appEnv.middleware.books.isOwner(true),
+      appEnv.middleware.books.isTraded(false),
       (req, res, next) => {
       console.log("in route toggle requestable to other users");
-      bookHandler.toggleRequestable(req.userBook, (err, data) => {
+      bookHandler.toggleRequestable(req.userBook, (err, userBookToggled) => {
         if (err)
           return next(
             new appEnv.errors.InternalError(
@@ -162,7 +163,9 @@ module.exports = function (app, appEnv) {
               "Error in toggle requestable"
             )
           )
-        res.json(data);
+        res.json({
+          results: userBookToggled
+        });
       });
     });
 

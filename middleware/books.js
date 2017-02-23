@@ -3,30 +3,34 @@
 let UserBook = require(process.cwd() + '/app/models/userBooks.js');
 
 let books = {
-  isOwner: function isOwner(req, res, next){
-    if (req.user._id.equals(req.userBook.user)){
-      return next();
-    } else {
-      if (req.xhr)
-        return res.json({
-          message: {
-            type: "danger",
-            text: "Only the owner of the book perform this action"
-          }
-        });
+  isOwner: function isOwner(isOwnerFlag){
+    return (req, res, next) => {
+      if (req.user._id.equals(req.userBook.user) == isOwnerFlag){
+        return next();
+      } else {
+        if (req.xhr)
+          return res.json({
+            message: {
+              type: "danger",
+              text: "Only the owner of the book can perform this action"
+            }
+          });
+      }
     }
   },
-  isNotTraded: function isTraded(req, res, next){
-    if (req.userBook.state.state != 'traded'){
-      return next();
-    } else {
-      if (req.xhr)
-        return res.json({
-          message: {
-            type: "danger",
-            text: "This action is not aloud on traded book."
-          }
-        });
+  isTraded: function isTraded(isTradedFlag){
+    return (req, res, next) => {
+      if ((req.userBook.state.state == 'traded') == isTradedFlag){
+        return next();
+      } else {
+        if (req.xhr)
+          return res.json({
+            message: {
+              type: "danger",
+              text: "This action is not aloud on a traded book."
+            }
+          });
+      }
     }
   }
 }

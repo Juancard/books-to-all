@@ -22,9 +22,7 @@
     let onAddBook = e => {
       e.preventDefault();
       btnSubmitBook.disabled = true;
-      console.log("on add book via ", urlSearchBooks);
       let url = urlSearchBooks + '?field=all&q=' + e.target.book.value;
-      console.log("on add book via ", url);
 
       ajaxFunctions.ajaxRequest(
         'GET',
@@ -114,10 +112,8 @@
       let userBookId = buttonClicked.parentElement.getElementsByTagName('INPUT')[0].value
       let buttonValue = buttonClicked.value;
 
-      console.log("click on book");
       buttonClicked.disabled = true;
       let callback = () => {
-        console.log("enable book again");
         buttonClicked.disabled = false;
       }
 

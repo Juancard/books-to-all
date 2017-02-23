@@ -233,9 +233,7 @@ function bookHandler () {
             )
           );
         userBookSaved.state = newState;
-        return callback(false, {
-          results: userBookSaved
-        });
+        return callback(false, userBookSaved);
       })
     }
 
