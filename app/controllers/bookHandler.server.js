@@ -202,7 +202,7 @@ function bookHandler () {
         );
       // FInally change state of book to 'inactive'
       this.setUserBookStateTo(userBook, 'inactive', (err, userBook, newState) =>{
-        if (err) callback(err);
+        if (err) return callback(err);
         userBook.save((err, userBookSaved) => {
           if (err)
             return callback(
@@ -212,13 +212,7 @@ function bookHandler () {
               )
             );
           userBookSaved.state = newState;
-          callback(false, {
-            results: userBookSaved,
-            message: {
-              type: 'success',
-              text: 'Succesfully removed ' + userBook.book.title
-            }
-          });
+          return callback(false, userBookSaved);
         });
       });
     });

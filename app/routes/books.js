@@ -130,7 +130,7 @@ module.exports = function (app, appEnv) {
       appEnv.middleware.books.isOwner,
       (req, res, next) => {
       console.log("in route remove book from user");
-      bookHandler.removeUserBook(req.userBook, (err, data) => {
+      bookHandler.removeUserBook(req.userBook, (err, userBookRemoved) => {
         if (err)
           return next(
             new appEnv.errors.InternalError(
@@ -138,7 +138,13 @@ module.exports = function (app, appEnv) {
               "Error in removing book"
             )
           )
-        res.json(data);
+        res.json({
+          results: userBookRemoved,
+          message: {
+            type: 'success',
+            text: 'Succesfully removed ' + req.userBook.book.title
+          }
+        });
       });
     });
 
