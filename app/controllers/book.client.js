@@ -7,8 +7,13 @@
   });
 
   //**************** ADD BOOK ***********************
-  let urlSearchBooks = appUrl + '/books/search';
-  let urlAddBook = appUrl + '/books/add';
+  let urlBook = appUrl + '/books';
+  let urlSearchBooks = urlBook + '/search';
+  let urlAdd = '/add';
+  let urlRemove = '/remove';
+  let urlToggle = '/toggleRequestable';
+  let urlRequest = "/request";
+
   let formAddBook = document.forms['addBookForm'] || null;
 
   if (formAddBook) {
@@ -17,7 +22,9 @@
     let onAddBook = e => {
       e.preventDefault();
       btnSubmitBook.disabled = true;
+      console.log("on add book via ", urlSearchBooks);
       let url = urlSearchBooks + '?field=all&q=' + e.target.book.value;
+      console.log("on add book via ", url);
 
       ajaxFunctions.ajaxRequest(
         'GET',
@@ -47,12 +54,14 @@
   }
 
   function addToUserBooks(bookChosen){
+    console.log("Book to add: ", bookChosen.id);
+    let url = urlBook +'/' + bookChosen.id['$t'] + urlAdd;
     let out = {
       book: bookChosen
     }
     ajaxFunctions.ajaxRequest(
       'POST',
-      urlAddBook,
+      url,
       out,
       ajaxFunctions.onDataReceived(
         (err, data) => {
@@ -98,7 +107,6 @@
   //**************** ACTIONS FOR BOOK USER ***********************
 
   let classesBookAction = document.getElementsByClassName('bookAction');
-  let urlBook = appUrl + '/books';
 
   let onBooksActionClick = e => {
     if (e.target && e.target.nodeName === "BUTTON") {
@@ -131,7 +139,7 @@
   //**************** REMOVE BOOK USER ***********************
   function onRemoveUserBook(bookUserId, callback){
     console.log("on remove user book", bookUserId);
-    let url = urlBook + '/' + bookUserId + '/remove';
+    let url = urlBook + '/' + bookUserId + urlRemove;
     ajaxFunctions.ajaxRequest('DELETE', url,
       null, ajaxFunctions.onDataReceived(
         (err, removed) => {
@@ -149,7 +157,7 @@
 
   function onToggleRequestableUserBook(bookUserId, callback){
     console.log("on toggle Requestable user book", bookUserId);
-    let url = urlBook + '/' + bookUserId + '/toggleRequestable';
+    let url = urlBook + '/' + bookUserId + urlToggle;
     ajaxFunctions.ajaxRequest('GET', url, null, ajaxFunctions.onDataReceived((err, toggled) => {
       if (toggled) {
         let bookElement = document.getElementById(toggled._id)
@@ -172,7 +180,7 @@
 
   function onRequestUserBook(bookUserId, callback){
     console.log("on request user book", bookUserId);
-    let url = urlBook + '/' + bookUserId + '/request';
+    let url = urlBook + '/' + bookUserId + urlRequest;
     ajaxFunctions.ajaxRequest('POST', url, null, ajaxFunctions.onDataReceived((err, requested) => {
       if (requested) {
         console.log(requested);

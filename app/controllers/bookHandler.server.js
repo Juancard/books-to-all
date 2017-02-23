@@ -45,72 +45,55 @@ function bookHandler () {
         callback(false, books);
       });
   },
-  this.addBookToUser = (user, bookJson, callback) => {
-    console.log("in bd handler add book to user");
-    console.log("user id: ", user.id, "\nbook title: ", bookJson.title);
 
-    //First add Book
-    // check if book is already in bd
-    Book
-      .findOne({goodreadsId: bookJson.goodreadsId})
-      .exec((err, book) => {
+  this.newBook = (bookJson, callback) => {
+    console.log("in bd creating new book");
+    let book = Book.newInstance(bookJson.title, bookJson.author,
+      bookJson.goodreadsId, bookJson.imageUrl,
+      bookJson.publicationYear);
+    book.save((err, result) => {
+      if (err)
+        return callback(
+          new http_verror.InternalError(
+            err,
+            "Could not save new book \"%s\" in database",
+            bookJson.title
+          )
+        );
+      callback(err, result);
+    });
+  },
+
+  this.addBookToUser = (user, book, callback) => {
+    console.log("in bd handler add book to user");
+    console.log("user id: ", user.id, "\nbook title: ", book.title);
+
+    // Create new copy of book for the user
+    let newUserBookState = UserBookState.newInstance('available');
+    let newUserBook = UserBook.newInstance(book.id, user.id, newUserBookState.id);
+    newUserBook.save((err, userBook) => {
+      if (err)
+        return callback(
+          new http_verror.InternalError(
+            err,
+            "Could not add book to user in database"
+          )
+        );
+      newUserBookState.userBook = userBook.id;
+      newUserBookState.save((err, userBookState) => {
         if (err)
           return callback(
             new http_verror.InternalError(
               err,
-              "On checking if book exists in database"
+              "Could not save the state of the new book in database"
             )
           );
-        if (!book) {
-          // Book was not in bd.
-          book = Book.newInstance(bookJson.title, bookJson.author,
-            bookJson.goodreadsId, bookJson.imageUrl,
-            bookJson.publicationYear);
-        }
-        console.log("book before saving: ", book);
-        if (book.state == 'inactive')
-          return callback(false, {
-            message: {
-              type: 'danger',
-              text: 'Book \"' + book.title + '\" is not aloud in our website.'
-            }
-          })
-        book.save((err, result) => {
-          if (err)
-            return callback(
-              new http_verror.InternalError(
-                err,
-                "Could not save book in database"
-              )
-            );
-          // Create new copy of book for the user
-          let newUserBookState = UserBookState.newInstance('available');
-          let newUserBook = UserBook.newInstance(result.id, user.id, newUserBookState.id);
-          newUserBook.save((err, userBook) => {
-            if (err)
-              return callback(
-                new http_verror.InternalError(
-                  err,
-                  "Could not add book to user in database"
-                )
-              );
-            newUserBookState.userBook = userBook.id;
-            newUserBookState.save((err, userBookState) => {
-              if (err)
-                return callback(
-                  new http_verror.InternalError(
-                    err,
-                    "Could not save the state of the new book in database"
-                  )
-                );
-              // populate before returning userBook to user
-              userBook.book = book;
-              userBook.state = userBookState;
-              return callback(false, {results: userBook});
-            });
-          });
-        });
+        // populate before returning userBook to user
+        userBook.book = book;
+        userBook.state = userBookState;
+        return callback(false, userBook);
       });
+    });
   },
 
   this.getUserBookById = (bookUserId, callback) => {

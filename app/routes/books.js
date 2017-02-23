@@ -7,6 +7,21 @@ module.exports = function (app, appEnv) {
   let BookHandler = require(appEnv.path + '/app/controllers/bookHandler.server.js');
   let bookHandler = new BookHandler();
 
+  app.param("goodreadsBook",  (req, res, next, goodreadsId) => {
+    console.log("Requested goodreadsId: ", goodreadsId);
+    bookHandler.getBookByUniqueId(goodreadsId, (err, book) => {
+      if (err)
+        return next(
+          new appEnv.errors.InternalError(
+            err,
+            "Error in retrieving the requested user's book"
+          )
+        );
+      req.book = book;
+      return next();
+    });
+  });
+
   app.param("userBook",  function (req, res, next, userBookId) {
 
     console.log("Requested userBook id: ", userBookId);
@@ -69,20 +84,45 @@ module.exports = function (app, appEnv) {
       });
     });
 
-  app.route('/books/add')
+  app.route('/books/:goodreadsBook/add')
     .post(appEnv.middleware.isLoggedIn, (req, res, next) => {
       console.log("in route add book to user");
-      let bookJson = apiBookHandler.getBookData(req.body.book);
-      bookHandler.addBookToUser(req.user, bookJson, (err, result) => {
-        if (err)
-          return next(
-            new appEnv.errors.InternalError(
-              err,
-              'Failed to add book to user'
-            )
-          );
-        res.json(result);
-      });
+
+      let onError = (err) => {
+        return next(
+          new appEnv.errors.InternalError(
+            err,
+            'Failed to add book to user'
+          )
+        );
+      }
+      let onBookAddedToUser = (err, result) => {
+        if (err) return onError(err);
+        res.json({results: result});
+      };
+
+      //Goodreads Book to add is already in our db?
+      if (!req.book){
+        console.log("Book is not on db, let's create it");
+        // it's not.
+        let bookJson = apiBookHandler.getBookData(req.body.book);
+        bookHandler.newBook(bookJson, (err, book) => {
+          if (err) return onError(err);
+          return bookHandler.addBookToUser(req.user, book, onBookAddedToUser);
+        });
+      } else {
+        // Book already exists in db
+        console.log("Book is in db, is it inactive?");
+        if (req.book.state == 'inactive')
+          res.json({
+            message: {
+              type: 'danger',
+              text: 'Book \"' + book.title + '\" is not aloud in our website.'
+            }
+          });
+        console.log("Book is not inactive, let's add it to the user");
+        return bookHandler.addBookToUser(req.user, req.book, onBookAddedToUser);
+      }
     });
 
   app.route('/books/:userBook([a-fA-F0-9]{24})/remove')
