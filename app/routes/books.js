@@ -171,9 +171,18 @@ module.exports = function (app, appEnv) {
 
   app.route('/books/:userBook([a-fA-F0-9]{24})/request')
     .post(appEnv.middleware.isLoggedIn,
+      appEnv.middleware.books.isOwner(false),
+      appEnv.middleware.books.isTraded(false),
       (req, res, next) => {
-      console.log("in route request book");
+        console.log("in route request book");
 
-      res.json(req.userBook);
-    });
+        res.json({
+          results: req.userBook,
+          message: {
+            type: 'success',
+            text: 'Request sent!'
+          }
+        });
+      }
+    );
 }
