@@ -7,14 +7,19 @@
             img.img-responsive(height="150", width="150", alt="book-"+userBook.book.title, src=userBook.imageUrl || userBook.book.imageUrl)
         .bookAction
           input(type='hidden', value=userBook.id)
-          button.btn.btn-block.btn-danger.btn-sm(value="remove") Remove
-          -console.log(userBook.state)
-          button.btn.btn-block.btn-warning.btn-sm(value="toggleRequestable")
-            if (userBook.state.state  == "unavailable")
-              | No trades accepted
-            else
-              | Accepts trades
-          button.btn.btn-block.btn-primary.btn-sm(value="request") Request
+          if (userBook.user.equals(user._id))
+            button.btn.btn-block.btn-danger.btn-sm(value="remove") Remove
+            button.btn.btn-block.btn-warning.btn-sm(value="toggleRequestable")
+              if (userBook.state.state  == "unavailable")
+                | No trades accepted
+              else
+                | Accepts trades
+          else
+            button.btn.btn-block.btn-primary.btn-sm(value="request")
+              if (userBook.state.state  == "traded")
+                | Traded
+              else
+                | Request
 
 #book-template(style='display: none')
   .col-xs-4.col-sm-3.col-md-2

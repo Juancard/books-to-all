@@ -22,6 +22,27 @@ function bookHandler () {
         callback(false, result);
       });
   },
+  this.getAllUserBooks = (callback) => {
+    console.log("Searching all user books in db");
+    UserBook
+      .find({})
+      .sort({ dateAdded: -1 })
+      .populate('book')
+      .populate('state')
+      .exec( (err, booksFound) => {
+        if (err)
+          return callback(
+            new http_verror.InternalError(
+              err,
+              "Could not retrieve all users books"
+            )
+          );
+        let books = booksFound.filter(
+          (book) => book.state.state != 'inactive'
+        );
+        callback(false, books);
+      });
+  },
   this.getBooksByUser = (user, callback) => {
     console.log("Searching books in bd by user:", user.id);
     UserBook

@@ -1,4 +1,22 @@
 extends skeleton.pug
 
+block append html_js
+  script(src="/public/js/modernizr.js")
+
+block append css
+  link(href='/public/css/books.css', rel='stylesheet', type="text/css")
+
 block content
-  include book.pug
+  header.row
+    .container
+      h3 All Books
+
+  .container
+    include book.pug
+    -let booksLength = books.length
+    if books.length <= 0
+      #noBooks.jumbotron.jumbotron-fluid
+        h3.display-3.text-muted.text-center No books added
+
+block append js
+  script(type="text/javascript", src="/controllers/book.client.js")

@@ -46,7 +46,7 @@ module.exports = function (app, appEnv) {
     });
   });
 
-  app.route('/mybooks')
+  app.route('/books/mine')
     .get(appEnv.middleware.isLoggedIn, (req, res, next) => {
       bookHandler.getBooksByUser(req.user, (err, results) => {
         if (err)
@@ -62,9 +62,20 @@ module.exports = function (app, appEnv) {
       });
     });
 
-  app.route('/allbooks')
+  app.route('/books/all')
     .get(appEnv.middleware.isLoggedIn, (req, res, next) => {
-      res.render(appEnv.path + "/app/views/allbooks.pug")
+      bookHandler.getAllUserBooks((err, results) => {
+        if (err)
+          return next(new appEnv.errors.InternalError(
+              err,
+              "Error in getting user's books"
+            )
+          )
+        let out = {
+          books: results
+        }
+        res.render(appEnv.path + "/app/views/allbooks.pug", out)
+      });
     });
 
   app.route('/books/search')
