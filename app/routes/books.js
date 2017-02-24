@@ -184,16 +184,26 @@ module.exports = function (app, appEnv) {
     .post(appEnv.middleware.isLoggedIn,
       appEnv.middleware.books.isOwner(false),
       appEnv.middleware.books.isTraded(false),
+      appEnv.middleware.books.isAvailable(true),
+      appEnv.middleware.books.isPendingForThisUser(false),
       (req, res, next) => {
         console.log("in route request book");
-
-        res.json({
-          results: req.userBook,
-          message: {
-            type: 'success',
-            text: 'Request sent!'
-          }
-        });
+        bookHandler.request(req.user, req.userBook, (err, result) => {
+          if (err)
+            return next(
+              new appEnv.errors.InternalError(
+                err,
+                "Error in requesting book"
+              )
+            )
+          res.json({
+            results: result,
+            message: {
+              type: 'success',
+              text: 'Request sent!'
+            }
+          });
+        })
       }
     );
 }

@@ -11,7 +11,6 @@ const stateHandler = new StateHandler(STATES, DEFAULT_STATE_NUMBER);
 var BookTradeState = new Schema({
 	bookTrade: {
     type: Schema.Types.ObjectId,
-		required: true,
     ref: 'BookTrade'
   },
   date: {

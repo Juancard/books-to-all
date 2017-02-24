@@ -163,7 +163,7 @@ function bookHandler () {
     });
   },
 
-  this.setUserBookTradesState = (userBook, fromState, toState, callback) => {
+  this.findTradesByUserBook = (userBook, callback) => {
     BookTrade
       .find({'userBook': userBook.id})
       .populate('state')
@@ -175,36 +175,66 @@ function bookHandler () {
               "Could not retrieve trades of this book"
             )
           );
-        trades.forEach((trade) => {
-          if (trade.state.state == fromState){
-            this.setTradeStateTo(trade, toState, (err, trade, newState) => {
+        return callback(false, trades);
+      });
+  },
+
+  this.findTradesBy = (userBook, requestedBy, callback) => {
+    console.log("In bd find trade by user", userBook, requestedBy);
+    BookTrade
+      .find({
+        'userBook': userBook.id,
+        'requestedBy': requestedBy.id
+      })
+      .populate('state')
+      .exec((err, trades) => {
+        if (err)
+          return callback(
+            new http_verror.InternalError(
+              err,
+              "Could not retrieve trades of the book"
+            )
+          );
+        return callback(false, trades);
+      });
+  },
+
+  this.setUserBookTradesState = (userBook, fromState, toState, callback) => {
+
+    this.findTradesByUserBook(userBook, (err, trades) => {
+      if (err) return callback(err);
+
+      trades.forEach((trade) => {
+        if (trade.state.state == fromState){
+          this.setTradeStateTo(trade, toState, (err, trade, newState) => {
+            if (err)
+              return callback(
+                new http_verror.InternalError(
+                  err,
+                  "Fail on setting new trade's state",
+                  String(trade.id),
+                  toState
+                )
+              );
+            trade.save((err, tradeSaved) => {
               if (err)
                 return callback(
                   new http_verror.InternalError(
                     err,
-                    "Fail on setting new trade's state",
+                    "Could not save trade %s after changing its state to %s",
                     String(trade.id),
                     toState
                   )
                 );
-              trade.save((err, tradeSaved) => {
-                if (err)
-                  return callback(
-                    new http_verror.InternalError(
-                      err,
-                      "Could not save trade %s after changing its state to %s",
-                      String(trade.id),
-                      toState
-                    )
-                  );
-                //Trade saved succesfully
-                console.log("Trade saved succesfully: ", tradeSaved.id);
-              });
+              //Trade saved succesfully
+              console.log("Trade saved succesfully: ", tradeSaved.id);
             });
-            // end of if state==pending
-          }
-          // end of trade.forEach
-        });
+          });
+
+          // end of if state==pending
+        }
+        // end of trade.forEach
+      });
       callback(false, userBook);
     });
   },
@@ -272,6 +302,39 @@ function bookHandler () {
     } else {
       this.setUserBookStateTo(userBook, 'available', onNewStateCallback);
     }
+  },
+
+  this.request = (user, userBook, callback) => {
+    let newTradeState = BookTradeState.newInstance('pending');
+    let newBookTrade = BookTrade.newInstance(
+      userBook,
+      user._id,
+      newTradeState
+    );
+
+    newBookTrade.save((err, tradeSaved) => {
+      if (err)
+        return callback(
+          new http_verror.InternalError(
+            err,
+            "Failed on creating new trade"
+          )
+        );
+      newTradeState.bookTrade = newBookTrade._id;
+      console.log(newBookTrade);
+      newTradeState.save((err, stateSaved) => {
+        if (err)
+          return callback(
+            new http_verror.InternalError(
+              err,
+              "Failed on creating state \"pending\" for the new trade"
+            )
+          );
+        tradeSaved.state = stateSaved;
+        console.log(newTradeState);
+        return callback(false, tradeSaved);
+      })
+    });
   }
 
 }
