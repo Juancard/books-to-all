@@ -48,7 +48,7 @@ module.exports = function (app, appEnv) {
 
   app.route('/books/mine')
     .get(appEnv.middleware.isLoggedIn, (req, res, next) => {
-      bookHandler.getBooksByUser(req.user, (err, results) => {
+      bookHandler.getBooksByUser(req.user, (err, books) => {
         if (err)
           return next(new appEnv.errors.InternalError(
               err,
@@ -56,7 +56,7 @@ module.exports = function (app, appEnv) {
             )
           )
         let out = {
-          books: results
+          books
         }
         res.render(appEnv.path + "/app/views/mybooks.pug", out);
       });
@@ -64,17 +64,35 @@ module.exports = function (app, appEnv) {
 
   app.route('/books/all')
     .get(appEnv.middleware.isLoggedIn, (req, res, next) => {
-      bookHandler.getAllUserBooks((err, results) => {
+      bookHandler.getAllUserBooks((err, books) => {
         if (err)
           return next(new appEnv.errors.InternalError(
               err,
               "Error in getting user's books"
             )
           )
-        let out = {
-          books: results
-        }
-        res.render(appEnv.path + "/app/views/allbooks.pug", out)
+          bookHandler.getTradesFromUserBookList(books, req.user, (err, trades) => {
+            if (err)
+              return next(new appEnv.errors.InternalError(
+                  err,
+                  "Error in getting trades from user's books"
+                )
+              )
+            for (let i=0; i<books.length; i++) {
+              books[i].trades = trades.filter(
+                (trade) => {
+                  let tradeUserBookId = trade.userBook;
+                  let tradeState = trade.state.state;
+                  let isTradeFromThisBook = tradeUserBookId.equals(books[i]._id);
+                  let isTradeOpen = tradeState == "accepted" || tradeState == 'pending';
+                  return isTradeOpen && isTradeFromThisBook;
+                });
+            }
+            let out = {
+              books
+            }
+            res.render(appEnv.path + "/app/views/allbooks.pug", out);
+          });
       });
     });
 

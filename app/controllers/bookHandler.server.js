@@ -335,6 +335,27 @@ function bookHandler () {
         return callback(false, tradeSaved);
       })
     });
+  },
+
+  this.getTradesFromUserBookList = (usersBooks, user, callback) => {
+    let usersBooksId = usersBooks.reduce(
+      (prev, post) => {
+        prev.push(post._id);
+        return prev;
+      }, []);
+    BookTrade
+      .find({
+        'userBook': {
+          $in: usersBooksId
+        },
+        'requestedBy': user._id
+      })
+      .populate('state')
+      .populate('requestedBy')
+      .exec((err, trades) => {
+        if (err) return callback(err);
+        return callback(false, trades);
+      })
   }
 
 }
