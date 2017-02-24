@@ -46,6 +46,30 @@ module.exports = function (app, appEnv) {
     });
   });
 
+  app.param("trade",  function (req, res, next, tradeId) {
+
+    console.log("Requested trade id: ", tradeId);
+
+    // ... VALIDATE trade ID
+    bookHandler.getTradeById(tradeId, function(err, trade){
+      if (err)
+        return next(
+          new appEnv.errors.InternalError(
+            err,
+            "Error in retrieving the requested trade"
+          )
+        );
+      if (!trade || (trade && (trade.state.state != 'pending') && (trade.state.state != 'accepted')))
+        return next(
+          new appEnv.errors.NotFound(
+            "The resource requested is not available"
+          )
+        );
+      req.trade = trade;
+      return next();
+    });
+  });
+
   app.route('/books/mine')
     .get(appEnv.middleware.isLoggedIn, (req, res, next) => {
       bookHandler.getBooksByUser(req.user, (err, books) => {
@@ -224,4 +248,32 @@ module.exports = function (app, appEnv) {
         })
       }
     );
+
+  app.route('/books/:userBook([a-fA-F0-9]{24})/request/:trade([a-fA-F0-9]{24})/cancel')
+    .post(appEnv.middleware.isLoggedIn,
+      appEnv.middleware.books.isOwner(false),
+      appEnv.middleware.books.isTraded(false),
+      appEnv.middleware.books.isAvailable(true),
+      appEnv.middleware.books.isTradePending(true),
+      (req, res, next) => {
+        console.log("in route request book");
+        bookHandler.cancelTrade(req.trade, (err, tradeCanceled) => {
+          if (err)
+            return next(
+              new appEnv.errors.InternalError(
+                err,
+                "Error in canceling request"
+              )
+            )
+          res.json({
+            results: tradeCanceled,
+            message: {
+              type: 'info',
+              text: 'Request canceled'
+            }
+          });
+        });
+      }
+    );
+
 }

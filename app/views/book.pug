@@ -6,7 +6,7 @@
           a(href=userBook.imageUrl || userBook.book.imageUrl)
             img.img-responsive(height="150", width="150", alt="book-"+userBook.book.title, src=userBook.imageUrl || userBook.book.imageUrl)
         .bookAction
-          input(type='hidden', value=userBook.id)
+          input.userBookId(type='hidden', value=userBook.id)
           - let userBookState = userBook.state.state
           if (userBook.user.equals(user._id))
             button.btn.btn-block.btn-danger.btn-sm(value="remove") Remove
@@ -20,11 +20,12 @@
               |  Trades
           else
             if (userBook.trades.length > 0)
+              input.tradeId(type='hidden', value=userBook.trades[0].id)
               - let tradeState = userBook.trades[0].state.state;
               if (tradeState == 'pending')
                 h4
                   span.label.label-default Trade Pending
-                button.btn.btn-block.btn-danger.btn-sm(value="cancel") Cancel Trade
+                button.btn.btn-block.btn-danger.btn-sm(value="cancel") Cancel Request
               else if (tradeState == 'accepted')
                 h4
                   span.label.label-success Trade Accepted

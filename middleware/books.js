@@ -83,6 +83,25 @@ let books = {
         }
       });
     }
+  },
+
+  isTradePending: function isTradePending(iWantItPending){
+    return (req, res, next) => {
+      let isPending = req.trade.state.state == 'pending';
+      if (isPending == iWantItPending) return next();
+      if (req.xhr) {
+        let out = {
+          message: {
+            type: "danger",
+          }
+        }
+        if (isPending)
+          out.message.text = "This action is not aloud on a pending trade.";
+        else
+          out.message.text = "This action is only aloud on pending trades.";
+        return res.json(out);
+      }
+    }
   }
 }
 

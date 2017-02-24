@@ -180,7 +180,6 @@ function bookHandler () {
   },
 
   this.findTradesBy = (userBook, requestedBy, callback) => {
-    console.log("In bd find trade by user", userBook, requestedBy);
     BookTrade
       .find({
         'userBook': userBook.id,
@@ -196,6 +195,22 @@ function bookHandler () {
             )
           );
         return callback(false, trades);
+      });
+  },
+
+  this.getTradeById = (tradeId, callback) => {
+    BookTrade
+      .findById(tradeId)
+      .populate('state')
+      .exec((err, trade) => {
+        if (err)
+          return callback(
+            new http_verror.InternalError(
+              err,
+              "Could not retrieve trade from id"
+            )
+          );
+        return callback(false, trade);
       });
   },
 
@@ -356,7 +371,24 @@ function bookHandler () {
         if (err) return callback(err);
         return callback(false, trades);
       })
+  },
+
+  this.cancelTrade = (trade, callback) => {
+    this.setTradeStateTo(trade, 'canceled', (err, tradeCanceled) => {
+      if (err) return callback(err);
+      tradeCanceled.save((err, tradeSaved) => {
+        if (err)
+          return callback(
+            new http_verror.InternalError(
+              err,
+              "Failed on saving canceled trade"
+            )
+          );
+        return callback(false, tradeSaved);
+      });
+    });
   }
+
 
 }
 

@@ -13,6 +13,7 @@
   let urlRemove = '/remove';
   let urlToggle = '/toggleRequestable';
   let urlRequest = "/request";
+  let urlCancel = "/cancel";
 
   let formAddBook = document.forms['addBookForm'] || null;
 
@@ -109,7 +110,9 @@
   let onBooksActionClick = e => {
     if (e.target && e.target.nodeName === "BUTTON") {
       let buttonClicked = e.target;
-      let userBookId = buttonClicked.parentElement.getElementsByTagName('INPUT')[0].value
+      let userBookId = buttonClicked.parentElement.getElementsByClassName('userBookId')[0].value
+      let tradeId = buttonClicked.parentElement.getElementsByClassName('tradeId')
+      if (tradeId.length > 0) tradeId = tradeId[0].value;
       let buttonValue = buttonClicked.value;
 
       buttonClicked.disabled = true;
@@ -123,6 +126,8 @@
         return onToggleRequestableUserBook(userBookId, callback);
       if (buttonValue == 'request')
         return onRequestUserBook(userBookId, callback);
+      if (buttonValue == 'cancel')
+        return onCancelRequest(userBookId, tradeId, callback);
     }
     e.stopPropagation();
   }
@@ -186,5 +191,21 @@
   }
 
   //****************** END REQUEST BOOK USER ********************
+
+  //******************* CANCEL BOOK REQUEST **********************
+
+  function onCancelRequest(bookUserId, tradeId, callback){
+    console.log("on cancel request", bookUserId, tradeId);
+    let url = urlBook + '/' + bookUserId + urlRequest + '/' + tradeId + urlCancel;
+    ajaxFunctions.ajaxRequest('POST', url, null, ajaxFunctions.onDataReceived((err, canceled) => {
+      if (canceled) {
+        console.log(canceled);
+      }
+      callback();
+    }))
+  }
+
+  //****************** END CANCEL BOOK REQUEST ********************
+
 
 })();
