@@ -1,5 +1,6 @@
 .books
   .row
+    - let statusColor = {traded: 'warning', pending: 'info', accepted: 'primary', denied: 'danger', canceled: 'warning', finished: 'success'}
     each userBook in books
       .col-xs-10.col-xs-offset-1.col-sm-offset-0.col-sm-3.col-md-2(id=userBook.id)
         .book(data-toggle='tooltip', title=userBook.book.title + " by "+ userBook.book.author)
@@ -10,8 +11,8 @@
           - let userBookState = userBook.state.state
           if (userBook.user.equals(user._id))
             if (userBookState  == "traded")
-              h4
-                span.label.label-info Traded
+              button.btn.btn-block.btn-sm.disabled(class="btn-"+ statusColor[userBookState])
+                |  Traded
             else
               button.btn.btn-block.btn-danger.btn-sm(value="remove") Remove
               button.btn.btn-block.btn-warning.btn-sm(value="toggleRequestable")
@@ -21,27 +22,28 @@
                   | Accepts trades
           else
             if (userBook.trades.length > 0)
-              input.tradeId(type='hidden', value=userBook.trades[0].id)
               - let tradeState = userBook.trades[0].state.state;
               if (tradeState == 'pending')
-                h4
-                  span.label.label-default Trade Pending
-                button.btn.btn-block.btn-danger.btn-sm(value="cancel") Cancel Request
+                button.btn.btn-block.btn-sm.disabled(class="btn-"+ statusColor[tradeState])
+                  |  Trade Pending
               else if (tradeState == 'accepted')
-                h4
-                  span.label.label-success Trade Accepted
-                button.btn.btn-block.btn-success.btn-sm(value="finish") Finish Trade
+                button.btn.btn-block.btn-sm.disabled(class="btn-"+ statusColor[tradeState])
+                  |  Trade Accepted
             else
                 if (userBookState  == "traded")
-                  h4
-                    span.label.label-info Traded
+                  button.btn.btn-block.btn-sm.disabled(class="btn-"+ statusColor[userBookState])
+                    |  Traded
                 else
                   button.btn.btn-block.btn-primary.btn-sm(value="request")
                     | Request
 
 
 #book-template(style='display: none')
-  .col-xs-4.col-sm-3.col-md-2
+  .col-xs-10.col-xs-offset-1.col-sm-offset-0.col-sm-3.col-md-2
     .book(data-toggle='tooltip', title='')
       a(href='')
         img.img-responsive(height="150", width="150", alt="", src='')
+    .bookAction
+      input.userBookId(type='hidden')
+      button.btn.btn-block.btn-danger.btn-sm(value="remove") Remove
+      button.btn.btn-block.btn-warning.btn-sm(value="toggleRequestable") Accepts trades

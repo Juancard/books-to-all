@@ -83,6 +83,7 @@
       if (toClear) toClear.outerHTML = '';
 
       let newBookElement = bookTemplate.cloneNode(true);
+      newBookElement.id = userBook._id;
 
       let classBook = newBookElement.getElementsByClassName('book')[0];
       //tooltip title, not book title
@@ -95,9 +96,10 @@
       imageBook.alt = "book-" + userBook.book.title;
       imageBook.src = userBook.imageUrl || userBook.book.imageUrl;
 
-      /*TODO
-        CREATE BUTTONS HERE
-      */
+      let classBookAction = newBookElement.getElementsByClassName('bookAction')[0];
+      addBookAction(classBookAction);
+      let inputUserBookId = classBookAction.getElementsByClassName('userBookId')[0];
+      inputUserBookId.value = userBook._id;
 
       bookContainer.insertBefore(newBookElement, bookContainer.firstChild);
     }
@@ -121,8 +123,13 @@
       let buttonValue = buttonClicked.value;
 
       buttonClicked.disabled = true;
-      let callback = () => {
+      let callback = (reload=false) => {
         buttonClicked.disabled = false;
+        // SUPER GIANT HARDCODE HERE!!
+        // RELOADS PAGE, JUST TO NOT HAVE TO REFRESH
+        // EVERY ELEMENT WITH NEW state
+        // THIS IS WRONG AND SHOULD NEVER BE DONE
+        if (reload) window.location.reload();
       }
 
       if (buttonValue == 'remove')
@@ -143,8 +150,12 @@
     e.stopPropagation();
   }
 
+  let addBookAction = (classBookAction) => {
+    classBookAction.addEventListener('click', onBooksActionClick, false);
+  }
+
   for (let i=0; i<classesBookAction.length; i++)
-    classesBookAction[i].addEventListener('click', onBooksActionClick, false);
+    addBookAction(classesBookAction[i]);
 
   //**************** END ACTIONS FOR BOOK USER ****************
 
@@ -173,7 +184,7 @@
     ajaxFunctions.ajaxRequest('GET', url, null, ajaxFunctions.onDataReceived((err, toggled) => {
       if (toggled) {
         let bookElement = document.getElementById(toggled._id)
-        let buttons = bookElement.getElementsByTagName('BUTTON');
+        let buttons = bookElement.getElementsByClassName('bookAction')[0].getElementsByTagName('BUTTON');
         for (let i=0; i<buttons.length; i++){
           if (buttons[i].value == 'toggleRequestable'){
             console.log(toggled);
@@ -197,7 +208,7 @@
       if (requested) {
         console.log(requested);
       }
-      callback();
+      callback(true);
     }))
   }
 
@@ -212,7 +223,7 @@
       if (canceled) {
         console.log(canceled);
       }
-      callback();
+      callback(true);
     }))
   }
 
@@ -227,7 +238,7 @@
       if (finished) {
         console.log(finished);
       }
-      callback();
+      callback(true);
     }))
   }
 
@@ -243,7 +254,7 @@
       if (denied) {
         console.log(denied);
       }
-      callback();
+      callback(true);
     }))
   }
 
@@ -258,7 +269,7 @@
       if (accepted) {
         console.log(accepted);
       }
-      callback();
+      callback(true);
     }))
   }
 
