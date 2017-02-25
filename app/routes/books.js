@@ -289,12 +289,21 @@ module.exports = function (app, appEnv) {
                 req.user.local.displayName
               )
             )
-          //res.json(tradesRequestedBy);
-          let out = {
-            requester: tradesRequestedBy,
-            requested: {}
-          }
-          res.render(appEnv.path + '/app/views/mytrades.pug', out);
+          bookHandler.tradesRequestedTo(req.user, (err, tradesRequestedTo) => {
+            if (err)
+              return next(
+                new appEnv.errors.InternalError(
+                  err,
+                  "Error in retrieveing trades requested to user %s",
+                  req.user.local.displayName
+                )
+              )
+            let out = {
+              requester: tradesRequestedBy,
+              requested: tradesRequestedTo
+            }
+            res.render(appEnv.path + '/app/views/mytrades.pug', out);
+          });
         })
       }
     );

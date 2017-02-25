@@ -405,12 +405,54 @@ function bookHandler () {
         model: 'User'
       }, {
         path: 'book',
-        model: 'Book'    
+        model: 'Book'
       }]
     })
-    .exec((err, results) => {
+    .exec((err, userBooks) => {
       if (err) return callback(err);
-      return callback(false, results);
+      return callback(false, userBooks);
+    })
+  },
+
+  this.tradesRequestedTo = (user, callback) => {
+    UserBook.find({
+      'user': user._id
+    })
+    .exec((err, userBooks) => {
+      if (err)
+        return callback(
+          new http_verror.InternalError(
+            err,
+            "Failed on retrieving books user own"
+          )
+        );
+      let userBooksIds = userBooks.reduce((prev, post) => {
+        prev.push(post._id);
+        return prev;
+      }, []);
+      BookTrade
+        .find({
+          'userBook': {
+            $in: userBooksIds
+          }
+        })
+        .populate("state")
+        .populate('requestedBy')
+        .populate({
+          path: "userBook",
+          model: "UserBook",
+          populate: [{
+            path: 'state',
+            model: 'UserBookState'
+          }, {
+            path: 'book',
+            model: 'Book'
+          }]
+        })
+        .exec((err, tradesRequestedTo) => {
+          if (err) return callback(err);
+          return callback(false, tradesRequestedTo);
+        });
     })
   }
 

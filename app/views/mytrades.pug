@@ -34,7 +34,7 @@ block content
                   h4.media-heading #{trade.userBook.book.title}
                   p Owner: #{trade.userBook.user.local.displayName}
                   p
-                    | Status: 
+                    | Status:
                     span.label(class="label-" + statusColor[tradeState]) #{tradeState}
             if (tradeState == 'pending' || tradeState == 'accepted')
               .panel-footer.row
@@ -46,5 +46,24 @@ block content
 
     h3 Books requested to me
     hr
-    .jumbotron.jumbotron-fluid
-      h3.display-3.text-muted.text-center No trades yet.
+    if (!requested)
+      .jumbotron.jumbotron-fluid
+        h3.display-3.text-muted.text-center No trades yet.
+    else
+      .row
+        each trade in requested
+          - let tradeState = trade.state.state;
+          - let tradeBook = trade.userBook.book;
+          .panel.col-md-4.col-sm-6(class='panel-' + statusColor[tradeState])
+            .panel-heading.row #{trade.requestedBy.local.displayName} - #{tradeState}
+            .panel-body.row
+              .media
+                .media-left(data-toggle='tooltip', title=tradeBook.title + " by "+ trade.userBook.book.author)
+                  a(href=trade.userBook.book.imageUrl)
+                    img.media-object(src=trade.userBook.book.imageUrl, alt=trade.userBook.book.title)
+                .media-body
+                  h4.media-heading #{trade.userBook.book.title}
+                  p Requested By: #{trade.requestedBy.local.displayName}
+                  p
+                    | Status:
+                    span.label(class="label-" + statusColor[tradeState]) #{tradeState}
