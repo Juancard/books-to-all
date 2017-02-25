@@ -1,6 +1,13 @@
 extends skeleton.pug
 
+block append html_js
+  script(src="/public/js/modernizr.js")
+
+block append css
+  link(href='/public/css/books.css', rel='stylesheet', type="text/css")
+
 block content
+  - let statusColor = {pending: 'info', accepted: 'primary', denied: 'danger', canceled: 'warning', finished: 'success'}
   header.row
     .container
       h3 My Trades
@@ -8,8 +15,35 @@ block content
   .container
     h3 Books I requested
     hr
-    .jumbotron.jumbotron-fluid
-      h3.display-3.text-muted.text-center No trades yet.
+    if (!requester)
+      .jumbotron.jumbotron-fluid
+        h3.display-3.text-muted.text-center No trades yet.
+    else
+      .row
+        each trade in requester
+          - let tradeState = trade.state.state;
+          - let tradeBook = trade.userBook.book;
+          .panel.col-md-4.col-sm-6(class='panel-' + statusColor[tradeState])
+            .panel-heading.row #{trade.userBook.user.local.displayName} - #{tradeState}
+            .panel-body.row
+              .media
+                .media-left(data-toggle='tooltip', title=tradeBook.title + " by "+ trade.userBook.book.author)
+                  a(href=trade.userBook.book.imageUrl)
+                    img.media-object(src=trade.userBook.book.imageUrl, alt=trade.userBook.book.title)
+                .media-body
+                  h4.media-heading #{trade.userBook.book.title}
+                  p Owner: #{trade.userBook.user.local.displayName}
+                  p
+                    | Status: 
+                    span.label(class="label-" + statusColor[tradeState]) #{tradeState}
+            if (tradeState == 'pending' || tradeState == 'accepted')
+              .panel-footer.row
+                .col-sm-offset-3.col-sm-6
+                  if (trade.state.state == 'pending')
+                    button.btn.btn-sm.btn-block.btn-danger Cancel Request
+                  else if (trade.state.state == 'accepted')
+                    button.btn.btn-sm.btn-danger Finish Trade
+
     h3 Books requested to me
     hr
     .jumbotron.jumbotron-fluid

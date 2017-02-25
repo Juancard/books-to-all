@@ -289,8 +289,12 @@ module.exports = function (app, appEnv) {
                 req.user.local.displayName
               )
             )
-          res.json(tradesRequestedBy);
-          //res.render(appEnv.path + '/app/views/mytrades.pug', out);
+          //res.json(tradesRequestedBy);
+          let out = {
+            requester: tradesRequestedBy,
+            requested: {}
+          }
+          res.render(appEnv.path + '/app/views/mytrades.pug', out);
         })
       }
     );
