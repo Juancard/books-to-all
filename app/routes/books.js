@@ -276,4 +276,22 @@ module.exports = function (app, appEnv) {
       }
     );
 
+  app.route('/mytrades')
+    .get(appEnv.middleware.isLoggedIn,
+      (req, res, next) => {
+        console.log("in route mytrades");
+        bookHandler.tradesRequestedBy(req.user, (err, tradesRequestedBy) => {
+          if (err)
+            return next(
+              new appEnv.errors.InternalError(
+                err,
+                "Error in retrieveing trades user %s requested",
+                req.user.local.displayName
+              )
+            )
+          res.json(tradesRequestedBy);
+          //res.render(appEnv.path + '/app/views/mytrades.pug', out);
+        })
+      }
+    );
 }

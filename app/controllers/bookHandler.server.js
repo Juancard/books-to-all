@@ -389,6 +389,30 @@ function bookHandler () {
     });
   }
 
+  this.tradesRequestedBy = (user, callback) => {
+    BookTrade.find({
+      'requestedBy': user._id
+    })
+    .populate("state")
+    .populate({
+      path: "userBook",
+      model: "UserBook",
+      populate: [{
+        path: 'state',
+        model: 'UserBookState'
+      }, {
+        path: 'user',
+        model: 'User'
+      }, {
+        path: 'book',
+        model: 'Book'    
+      }]
+    })
+    .exec((err, results) => {
+      if (err) return callback(err);
+      return callback(false, results);
+    })
+  }
 
 }
 
