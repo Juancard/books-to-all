@@ -15,9 +15,6 @@
                 | No trades accepted
               else
                 | Accepts trades
-            a.btn.btn-block.btn-info.btn-sm(href="")
-              span.glyphicon.glyphicon-eye-open
-              |  Trades
           else
             if (userBook.trades.length > 0)
               input.tradeId(type='hidden', value=userBook.trades[0].id)

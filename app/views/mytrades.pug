@@ -10,12 +10,12 @@ block content
   - let statusColor = {pending: 'info', accepted: 'primary', denied: 'danger', canceled: 'warning', finished: 'success'}
   header.row
     .container
-      h3 My Trades
+      h2 My Trades
 
   .container
     h3 Books I requested
     hr
-    if (!requester)
+    if (requester.length <= 0)
       .jumbotron.jumbotron-fluid
         h3.display-3.text-muted.text-center No trades yet.
     else
@@ -27,7 +27,7 @@ block content
             .panel-heading.row #{trade.userBook.user.local.displayName} - #{tradeState}
             .panel-body.row
               .media
-                .media-left(data-toggle='tooltip', title=tradeBook.title + " by "+ trade.userBook.book.author)
+                .media-left
                   a(href=trade.userBook.book.imageUrl)
                     img.media-object(src=trade.userBook.book.imageUrl, alt=trade.userBook.book.title)
                 .media-body
@@ -36,17 +36,17 @@ block content
                   p
                     | Status:
                     span.label(class="label-" + statusColor[tradeState]) #{tradeState}
-            if (tradeState == 'pending' || tradeState == 'accepted')
-              .panel-footer.row
-                .col-sm-offset-3.col-sm-6
-                  if (trade.state.state == 'pending')
-                    button.btn.btn-sm.btn-block.btn-danger Cancel Request
-                  else if (trade.state.state == 'accepted')
-                    button.btn.btn-sm.btn-danger Finish Trade
+                  .bookAction
+                    input.userBookId(type='hidden', value=trade.userBook.id)
+                    input.tradeId(type='hidden', value=trade.id)
+                    if (trade.state.state == 'pending')
+                      button.btn.btn-sm.btn-block.btn-warning(value="cancel") Cancel Request
+                    else if (trade.state.state == 'accepted')
+                      button.btn.btn-sm.btn-danger(value="finish") Finish Trade
 
     h3 Books requested to me
     hr
-    if (!requested)
+    if (requested.length <= 0)
       .jumbotron.jumbotron-fluid
         h3.display-3.text-muted.text-center No trades yet.
     else
@@ -58,7 +58,7 @@ block content
             .panel-heading.row #{trade.requestedBy.local.displayName} - #{tradeState}
             .panel-body.row
               .media
-                .media-left(data-toggle='tooltip', title=tradeBook.title + " by "+ trade.userBook.book.author)
+                .media-left
                   a(href=trade.userBook.book.imageUrl)
                     img.media-object(src=trade.userBook.book.imageUrl, alt=trade.userBook.book.title)
                 .media-body
@@ -67,3 +67,12 @@ block content
                   p
                     | Status:
                     span.label(class="label-" + statusColor[tradeState]) #{tradeState}
+                  if (tradeState == 'pending')
+                    .btn-group.bookAction
+                      input.userBookId(type='hidden', value=trade.userBook.id)
+                      input.tradeId(type='hidden', value=trade.id)
+                      button.btn.btn-sm.btn-primary(value="accept") Accept
+                      button.btn.btn-sm.btn-danger(value="deny") Deny
+
+block append js
+  script(type="text/javascript", src="/controllers/book.client.js")
