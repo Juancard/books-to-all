@@ -487,6 +487,25 @@ function bookHandler () {
         return callback(false, tradeSaved);
       });
     });
+  },
+
+  this.acceptTrade = (trade, userBook, callback) => {
+    this.setTradeStateTo(trade, 'accepted', (err, tradeAccepted) => {
+      if (err) return callback(err);
+      tradeAccepted.save((err, tradeSaved) => {
+        if (err)
+          return callback(
+            new http_verror.InternalError(
+              err,
+              "Failed on saving accepted trade"
+            )
+          );
+        this.setUserBookTradesState(userBook, 'pending', 'denied', (err, trades) => {
+          if (err) return callback(err);
+          return callback(false, tradeSaved);
+        });
+      });
+    });
   }
 }
 

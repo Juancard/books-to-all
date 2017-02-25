@@ -354,7 +354,7 @@ module.exports = function (app, appEnv) {
             results: tradeDenied,
             message: {
               type: 'success',
-              text: 'request denied!'
+              text: 'Request denied!'
             }
           });
         });
@@ -368,12 +368,21 @@ module.exports = function (app, appEnv) {
       appEnv.middleware.books.isTradePending(true),
       (req, res, next) => {
         console.log("in route accept request");
-        res.json({
-          results: req.trade,
-          message: {
-            type: 'info',
-            text: 'Request accepted'
-          }
+        bookHandler.acceptTrade(req.trade, req.userBook, (err, tradeAccepted) => {
+          if (err)
+            return next(
+              new appEnv.errors.InternalError(
+                err,
+                "Error in accepting request to trade"
+              )
+            )
+          res.json({
+            results: tradeAccepted,
+            message: {
+              type: 'success',
+              text: 'Request accepted!'
+            }
+          });
         });
       }
     );
