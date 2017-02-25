@@ -14,6 +14,9 @@
   let urlToggle = '/toggleRequestable';
   let urlRequest = "/request";
   let urlCancel = "/cancel";
+  let urlFinish = "/finish";
+  let urlAccept = "/accept";
+  let urlDeny = "/deny";
 
   let formAddBook = document.forms['addBookForm'] || null;
 
@@ -50,58 +53,60 @@
     }
     formAddBook.addEventListener('submit', onAddBook);
 
-  }
-
-  function addToUserBooks(bookChosen){
-    console.log("Book to add: ", bookChosen.id);
-    let url = urlBook +'/' + bookChosen.id['$t'] + urlAdd;
-    let out = {
-      book: bookChosen
+    function addToUserBooks(bookChosen){
+      console.log("Book to add: ", bookChosen.id);
+      let url = urlBook +'/' + bookChosen.id['$t'] + urlAdd;
+      let out = {
+        book: bookChosen
+      }
+      ajaxFunctions.ajaxRequest(
+        'POST',
+        url,
+        out,
+        ajaxFunctions.onDataReceived(
+          (err, data) => {
+            if (data) return addBookElement(data)
+          }
+        )
+      );
     }
-    ajaxFunctions.ajaxRequest(
-      'POST',
-      url,
-      out,
-      ajaxFunctions.onDataReceived(
-        (err, data) => {
-          if (data) return addBookElement(data)
-        }
-      )
-    );
+
+    //**************** END ADD BOOK ***********************
+
+    //**************** ADD BOOK ELEMENT ***********************
+
+    const bookTemplate = document.getElementById('book-template').firstChild;
+    const bookContainer = document.getElementsByClassName('books')[0].firstChild;
+
+    function addBookElement(userBook){
+      let toClear = document.getElementById('noBooks');
+      if (toClear) toClear.outerHTML = '';
+
+      let newBookElement = bookTemplate.cloneNode(true);
+
+      let classBook = newBookElement.getElementsByClassName('book')[0];
+      //tooltip title, not book title
+      classBook.title = userBook.book.title + " by " + userBook.book.author;
+
+      let linkBook = classBook.getElementsByTagName('A')[0];
+      linkBook.href = userBook.imageUrl || userBook.book.imageUrl;
+
+      let imageBook = linkBook.getElementsByTagName('IMG')[0];
+      imageBook.alt = "book-" + userBook.book.title;
+      imageBook.src = userBook.imageUrl || userBook.book.imageUrl;
+
+      /*TODO
+        CREATE BUTTONS HERE
+      */
+
+      bookContainer.insertBefore(newBookElement, bookContainer.firstChild);
+    }
+
+    //**************** END ADD BOOK ELEMENT ***********************
+
+    // end if formAddBook
   }
 
-  //**************** END ADD BOOK ***********************
-
-  //**************** ADD BOOK ELEMENT ***********************
-
-  const bookTemplate = document.getElementById('book-template').firstChild;
-  const bookContainer = document.getElementsByClassName('books')[0].firstChild;
-
-  function addBookElement(userBook){
-    let toClear = document.getElementById('noBooks');
-    if (toClear) toClear.outerHTML = '';
-
-    let newBookElement = bookTemplate.cloneNode(true);
-
-    let classBook = newBookElement.getElementsByClassName('book')[0];
-    //tooltip title, not book title
-    classBook.title = userBook.book.title + " by " + userBook.book.author;
-
-    let linkBook = classBook.getElementsByTagName('A')[0];
-    linkBook.href = userBook.imageUrl || userBook.book.imageUrl;
-
-    let imageBook = linkBook.getElementsByTagName('IMG')[0];
-    imageBook.alt = "book-" + userBook.book.title;
-    imageBook.src = userBook.imageUrl || userBook.book.imageUrl;
-
-    /*TODO
-      CREATE BUTTONS HERE
-    */
-
-    bookContainer.insertBefore(newBookElement, bookContainer.firstChild);
-  }
-
-  //**************** END ADD BOOK ELEMENT ***********************
 
   //**************** ACTIONS FOR BOOK USER ***********************
 
@@ -128,6 +133,12 @@
         return onRequestUserBook(userBookId, callback);
       if (buttonValue == 'cancel')
         return onCancelRequest(userBookId, tradeId, callback);
+      if (buttonValue == 'finish')
+        return onFinishTrade(userBookId, tradeId, callback);
+      if (buttonValue == 'deny')
+        return onDenyRequest(userBookId, tradeId, callback);
+      if (buttonValue == 'accept')
+        return onAcceptRequest(userBookId, tradeId, callback);
     }
     e.stopPropagation();
   }
@@ -207,5 +218,50 @@
 
   //****************** END CANCEL BOOK REQUEST ********************
 
+  //******************* FINISH trade **********************
+
+  function onFinishTrade(bookUserId, tradeId, callback){
+    console.log("on finish trade", bookUserId, tradeId);
+    let url = urlBook + '/' + bookUserId + urlRequest + '/' + tradeId + urlFinish;
+    ajaxFunctions.ajaxRequest('POST', url, null, ajaxFunctions.onDataReceived((err, finished) => {
+      if (finished) {
+        console.log(finished);
+      }
+      callback();
+    }))
+  }
+
+  //****************** END FINISH TRADE ********************
+
+
+  //******************* DENY BOOK REQUEST **********************
+
+  function onDenyRequest(bookUserId, tradeId, callback){
+    console.log("on deny request", bookUserId, tradeId);
+    let url = urlBook + '/' + bookUserId + urlRequest + '/' + tradeId + urlDeny;
+    ajaxFunctions.ajaxRequest('POST', url, null, ajaxFunctions.onDataReceived((err, denied) => {
+      if (denied) {
+        console.log(denied);
+      }
+      callback();
+    }))
+  }
+
+  //****************** END DENY BOOK REQUEST ********************
+
+  //******************* ACCEPT BOOK REQUEST **********************
+
+  function onAcceptRequest(bookUserId, tradeId, callback){
+    console.log("on accept request", bookUserId, tradeId);
+    let url = urlBook + '/' + bookUserId + urlRequest + '/' + tradeId + urlAccept;
+    ajaxFunctions.ajaxRequest('POST', url, null, ajaxFunctions.onDataReceived((err, accepted) => {
+      if (accepted) {
+        console.log(accepted);
+      }
+      callback();
+    }))
+  }
+
+  //****************** END ACCEPT BOOK REQUEST ********************
 
 })();

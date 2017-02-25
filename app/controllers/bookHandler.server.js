@@ -38,7 +38,8 @@ function bookHandler () {
             )
           );
         let books = booksFound.filter(
-          (book) => book.state.state != 'inactive'
+          (book) => book.state.state != 'inactive' &&
+                    book.state.state != 'unavailable'
         );
         callback(false, books);
       });

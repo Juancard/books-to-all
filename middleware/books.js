@@ -102,7 +102,45 @@ let books = {
         return res.json(out);
       }
     }
-  }
+  },
+
+  isTradeAccepted: function isTradePending(iWantItAccepted){
+    return (req, res, next) => {
+      let isAccepted = req.trade.state.state == 'accepted';
+      if (isAccepted == iWantItAccepted) return next();
+      if (req.xhr) {
+        let out = {
+          message: {
+            type: "danger",
+          }
+        }
+        if (isAccepted)
+          out.message.text = "This action is not aloud on an accepted trade.";
+        else
+          out.message.text = "This action is only aloud on an accepted trade.";
+        return res.json(out);
+      }
+    }
+  },
+
+  isTradeRequestedBy: function isTradeRequestedBy(iWantItRequestedBy){
+    return (req, res, next) => {
+      let isTradeRequestedBy = req.trade.requestedBy.equals(req.user._id);
+      if (isTradeRequestedBy == iWantItRequestedBy) return next();
+      if (req.xhr) {
+        let out = {
+          message: {
+            type: "danger",
+          }
+        }
+        if (isTradeRequestedBy)
+          out.message.text = "This action is not aloud for the user who requested this trade";
+        else
+          out.message.text = "This action is only aloud for the user who requested this trade";
+        return res.json(out);
+      }
+    }
+  },
 }
 
 module.exports = books;

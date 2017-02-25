@@ -70,6 +70,38 @@ module.exports = function (app, appEnv) {
     });
   });
 
+  app.route('/mytrades')
+    .get(appEnv.middleware.isLoggedIn,
+      (req, res, next) => {
+        console.log("in route mytrades");
+        bookHandler.tradesRequestedBy(req.user, (err, tradesRequestedBy) => {
+          if (err)
+            return next(
+              new appEnv.errors.InternalError(
+                err,
+                "Error in retrieveing trades user %s requested",
+                req.user.local.displayName
+              )
+            )
+          bookHandler.tradesRequestedTo(req.user, (err, tradesRequestedTo) => {
+            if (err)
+              return next(
+                new appEnv.errors.InternalError(
+                  err,
+                  "Error in retrieveing trades requested to user %s",
+                  req.user.local.displayName
+                )
+              )
+            let out = {
+              requester: tradesRequestedBy,
+              requested: tradesRequestedTo
+            }
+            res.render(appEnv.path + '/app/views/mytrades.pug', out);
+          });
+        })
+      }
+    );
+
   app.route('/books/mine')
     .get(appEnv.middleware.isLoggedIn, (req, res, next) => {
       bookHandler.getBooksByUser(req.user, (err, books) => {
@@ -276,35 +308,73 @@ module.exports = function (app, appEnv) {
       }
     );
 
-  app.route('/mytrades')
-    .get(appEnv.middleware.isLoggedIn,
+  app.route('/books/:userBook([a-fA-F0-9]{24})/request/:trade([a-fA-F0-9]{24})/finish')
+    .post(appEnv.middleware.isLoggedIn,
+      appEnv.middleware.books.isOwner(false),
+      appEnv.middleware.books.isTraded(true),
+      appEnv.middleware.books.isTradeRequestedBy(true),
+      appEnv.middleware.books.isTradeAccepted(true),
       (req, res, next) => {
-        console.log("in route mytrades");
-        bookHandler.tradesRequestedBy(req.user, (err, tradesRequestedBy) => {
+        console.log("in route finish trade");
+        res.json({
+          results: req.trade,
+          message: {
+            type: 'info',
+            text: 'Trade finished'
+          }
+        });
+        /*
+        bookHandler.finishTrade(req.trade, (err, tradeCanceled) => {
           if (err)
             return next(
               new appEnv.errors.InternalError(
                 err,
-                "Error in retrieveing trades user %s requested",
-                req.user.local.displayName
+                "Error in canceling request"
               )
             )
-          bookHandler.tradesRequestedTo(req.user, (err, tradesRequestedTo) => {
-            if (err)
-              return next(
-                new appEnv.errors.InternalError(
-                  err,
-                  "Error in retrieveing trades requested to user %s",
-                  req.user.local.displayName
-                )
-              )
-            let out = {
-              requester: tradesRequestedBy,
-              requested: tradesRequestedTo
+          res.json({
+            results: tradeCanceled,
+            message: {
+              type: 'info',
+              text: 'Request canceled'
             }
-            res.render(appEnv.path + '/app/views/mytrades.pug', out);
           });
-        })
+        });
+        */
+      }
+    );
+
+  app.route('/books/:userBook([a-fA-F0-9]{24})/request/:trade([a-fA-F0-9]{24})/deny')
+    .post(appEnv.middleware.isLoggedIn,
+      appEnv.middleware.books.isOwner(true),
+      appEnv.middleware.books.isTraded(false),
+      appEnv.middleware.books.isTradePending(true),
+      (req, res, next) => {
+        console.log("in route deny request");
+        res.json({
+          results: req.trade,
+          message: {
+            type: 'info',
+            text: 'Request denied'
+          }
+        });
+      }
+    );
+
+  app.route('/books/:userBook([a-fA-F0-9]{24})/request/:trade([a-fA-F0-9]{24})/accept')
+    .post(appEnv.middleware.isLoggedIn,
+      appEnv.middleware.books.isOwner(true),
+      appEnv.middleware.books.isTraded(false),
+      appEnv.middleware.books.isTradePending(true),
+      (req, res, next) => {
+        console.log("in route accept request");
+        res.json({
+          results: req.trade,
+          message: {
+            type: 'info',
+            text: 'Request accepted'
+          }
+        });
       }
     );
 }
