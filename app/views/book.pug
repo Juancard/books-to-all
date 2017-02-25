@@ -9,12 +9,16 @@
           input.userBookId(type='hidden', value=userBook.id)
           - let userBookState = userBook.state.state
           if (userBook.user.equals(user._id))
-            button.btn.btn-block.btn-danger.btn-sm(value="remove") Remove
-            button.btn.btn-block.btn-warning.btn-sm(value="toggleRequestable")
-              if (userBookState  == "unavailable")
-                | No trades accepted
-              else
-                | Accepts trades
+            if (userBookState  == "traded")
+              h4
+                span.label.label-info Traded
+            else
+              button.btn.btn-block.btn-danger.btn-sm(value="remove") Remove
+              button.btn.btn-block.btn-warning.btn-sm(value="toggleRequestable")
+                if (userBookState  == "unavailable")
+                  | No trades accepted
+                else
+                  | Accepts trades
           else
             if (userBook.trades.length > 0)
               input.tradeId(type='hidden', value=userBook.trades[0].id)

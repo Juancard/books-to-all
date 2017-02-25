@@ -457,7 +457,7 @@ function bookHandler () {
     })
   },
 
-  this.finishTrade = (trade, callback) => {
+  this.finishTrade = (trade, userBook, callback) => {
     this.setTradeStateTo(trade, 'finished', (err, tradeFinished) => {
       if (err) return callback(err);
       tradeFinished.save((err, tradeSaved) => {
@@ -468,7 +468,19 @@ function bookHandler () {
               "Failed on saving finished trade"
             )
           );
-        return callback(false, tradeSaved);
+        this.setUserBookStateTo(userBook, 'available', (err, userBookTraded) => {
+          if (err) return callback(err);
+          userBookTraded.save((err, userBookTradedSaved) => {
+            if (err)
+              return callback(
+                new http_verror.InternalError(
+                  err,
+                  "Failed on saving user book traded"
+                )
+              );
+            return callback(false, tradeSaved);
+          });
+        });
       });
     });
   },
@@ -502,7 +514,19 @@ function bookHandler () {
           );
         this.setUserBookTradesState(userBook, 'pending', 'denied', (err, trades) => {
           if (err) return callback(err);
-          return callback(false, tradeSaved);
+          this.setUserBookStateTo(userBook, 'traded', (err, userBookTraded) => {
+            if (err) return callback(err);
+            userBookTraded.save((err, userBookTradedSaved) => {
+              if (err)
+                return callback(
+                  new http_verror.InternalError(
+                    err,
+                    "Failed on saving user book traded"
+                  )
+                );
+              return callback(false, tradeSaved);
+            });
+          });
         });
       });
     });

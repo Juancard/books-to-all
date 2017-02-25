@@ -214,6 +214,7 @@ module.exports = function (app, appEnv) {
   app.route('/books/:userBook([a-fA-F0-9]{24})/remove')
     .delete(appEnv.middleware.isLoggedIn,
       appEnv.middleware.books.isOwner(true),
+      appEnv.middleware.books.isTraded(false),
       (req, res, next) => {
       console.log("in route remove book from user");
       bookHandler.removeUserBook(req.userBook, (err, userBookRemoved) => {
@@ -237,7 +238,7 @@ module.exports = function (app, appEnv) {
   app.route('/books/:userBook([a-fA-F0-9]{24})/toggleRequestable')
     .get(appEnv.middleware.isLoggedIn,
       appEnv.middleware.books.isOwner(true),
-      appEnv.middleware.books.isTraded(false),
+      appEnv.middleware.books.isTraded(false),    
       (req, res, next) => {
       console.log("in route toggle requestable to other users");
       bookHandler.toggleRequestable(req.userBook, (err, userBookToggled) => {
@@ -316,7 +317,7 @@ module.exports = function (app, appEnv) {
       appEnv.middleware.books.isTradeAccepted(true),
       (req, res, next) => {
         console.log("in route finish trade");
-        bookHandler.finishTrade(req.trade, (err, tradeFinished) => {
+        bookHandler.finishTrade(req.trade, req.userBook, (err, tradeFinished) => {
           if (err)
             return next(
               new appEnv.errors.InternalError(
