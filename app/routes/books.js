@@ -316,31 +316,22 @@ module.exports = function (app, appEnv) {
       appEnv.middleware.books.isTradeAccepted(true),
       (req, res, next) => {
         console.log("in route finish trade");
-        res.json({
-          results: req.trade,
-          message: {
-            type: 'info',
-            text: 'Trade finished'
-          }
-        });
-        /*
-        bookHandler.finishTrade(req.trade, (err, tradeCanceled) => {
+        bookHandler.finishTrade(req.trade, (err, tradeFinished) => {
           if (err)
             return next(
               new appEnv.errors.InternalError(
                 err,
-                "Error in canceling request"
+                "Error in finishing trade"
               )
             )
           res.json({
-            results: tradeCanceled,
+            results: tradeFinished,
             message: {
-              type: 'info',
-              text: 'Request canceled'
+              type: 'success',
+              text: 'Trade Finished!'
             }
           });
         });
-        */
       }
     );
 
@@ -351,12 +342,21 @@ module.exports = function (app, appEnv) {
       appEnv.middleware.books.isTradePending(true),
       (req, res, next) => {
         console.log("in route deny request");
-        res.json({
-          results: req.trade,
-          message: {
-            type: 'info',
-            text: 'Request denied'
-          }
+        bookHandler.denyTrade(req.trade, (err, tradeDenied) => {
+          if (err)
+            return next(
+              new appEnv.errors.InternalError(
+                err,
+                "Error in denying request to trade"
+              )
+            )
+          res.json({
+            results: tradeDenied,
+            message: {
+              type: 'success',
+              text: 'request denied!'
+            }
+          });
         });
       }
     );

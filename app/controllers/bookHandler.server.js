@@ -455,8 +455,39 @@ function bookHandler () {
           return callback(false, tradesRequestedTo);
         });
     })
-  }
+  },
 
+  this.finishTrade = (trade, callback) => {
+    this.setTradeStateTo(trade, 'finished', (err, tradeFinished) => {
+      if (err) return callback(err);
+      tradeFinished.save((err, tradeSaved) => {
+        if (err)
+          return callback(
+            new http_verror.InternalError(
+              err,
+              "Failed on saving finished trade"
+            )
+          );
+        return callback(false, tradeSaved);
+      });
+    });
+  },
+
+  this.denyTrade = (trade, callback) => {
+    this.setTradeStateTo(trade, 'denied', (err, tradeDenied) => {
+      if (err) return callback(err);
+      tradeDenied.save((err, tradeSaved) => {
+        if (err)
+          return callback(
+            new http_verror.InternalError(
+              err,
+              "Failed on saving denied trade"
+            )
+          );
+        return callback(false, tradeSaved);
+      });
+    });
+  }
 }
 
 module.exports = bookHandler;

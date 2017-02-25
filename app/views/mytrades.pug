@@ -40,9 +40,9 @@ block content
                     input.userBookId(type='hidden', value=trade.userBook.id)
                     input.tradeId(type='hidden', value=trade.id)
                     if (trade.state.state == 'pending')
-                      button.btn.btn-sm.btn-block.btn-warning(value="cancel") Cancel Request
+                      button.btn.btn-sm.btn-warning(value="cancel") Cancel Request
                     else if (trade.state.state == 'accepted')
-                      button.btn.btn-sm.btn-danger(value="finish") Finish Trade
+                      button.btn.btn-sm.btn-success(value="finish") Finish Trade
 
     h3 Books requested to me
     hr
