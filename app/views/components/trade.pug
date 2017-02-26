@@ -1,0 +1,38 @@
+- let tradeState = trade.state.state;
+- let tradeBook = trade.userBook.book;
+- let requestedBy = trade.requestedBy;
+- let owner = trade.userBook.user;
+- let isOwner = owner._id.equals(user._id);
+- let userToShow = (isOwner)? requestedBy.local.displayName : owner.local.displayName;
+- let isPending = tradeState == 'pending';
+- let isAccepted = tradeState == 'accepted';
+- let capitalizeFirstLetter = string => string.charAt(0).toUpperCase() + string.slice(1);
+.col-md-6
+  .tradeContainer.panel(id=trade.id, class='panel-' + statusColor[tradeState])
+    .panel-heading
+      span.userToShow #{userToShow}
+      | #{' '}-#{' '}
+      span.statusHeader #{capitalizeFirstLetter(tradeState)}
+      button.close(type='button', data-target='#'+trade.id, data-dismiss='alert')
+        span(aria-hidden='true') ×
+        span.sr-only Close
+    .panel-body
+      .bookContainer(id=trade.userBook.id).row
+          .col-sm-4.col-xs-12
+            a(href=tradeBook.imageUrl)
+              img.responsive(height="180", width="150", src=tradeBook.imageUrl, alt=tradeBook.title)
+          .col-sm-8.col-xs-12
+            h4 #{tradeBook.title}
+            p Owner: #{(isOwner)? 'You' : owner.local.displayName}
+            p Requested By: #{(isOwner)? requestedBy.local.displayName : 'You'}
+            p
+              | Status:#{' '}
+              span.status.label(class="label-" + statusColor[tradeState]) #{capitalizeFirstLetter(tradeState)}
+            if (isOwner && isPending)
+              .btn-group
+                button.action.btn.btn-md.btn-danger(value="deny") Deny
+                button.action.btn.btn-md.btn-success(value="accept") Accept
+            if (!isOwner && isPending)
+              button.action.btn.btn-sm.btn-warning(value="cancel") Cancel Request
+            if (!isOwner && isAccepted)
+              button.action.btn.btn-sm.btn-success(value="finish") Finish Trade
