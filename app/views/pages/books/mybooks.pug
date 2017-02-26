@@ -1,4 +1,4 @@
-extends skeleton.pug
+extends ../../skeleton.pug
 
 block append html_js
   script(src="/public/js/modernizr.js")
@@ -9,10 +9,16 @@ block append css
 block content
   header.row
     .container
-      h2 All Books
-
+      h2 My Books
+      .row
+        form(name="addBookForm").col-md-4.col-md-offset-8
+          .input-group
+            input.form-control(type="text", name='book', placeholder="Search & add books", tabindex='1', required)
+            span.input-group-btn
+              button.btn.btn-default(type="submit", tabindex='2')
+                span.glyphicon.glyphicon-search
   .container
-    include book.pug
+    include ../../components/books.pug
     -let booksLength = books.length
     if books.length <= 0
       #noBooks.jumbotron.jumbotron-fluid

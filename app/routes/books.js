@@ -96,7 +96,7 @@ module.exports = function (app, appEnv) {
               requester: tradesRequestedBy,
               requested: tradesRequestedTo
             }
-            res.render(appEnv.path + '/app/views/mytrades.pug', out);
+            res.render(appEnv.path + '/app/views/pages/books/mytrades.pug', out);
           });
         })
       }
@@ -114,11 +114,11 @@ module.exports = function (app, appEnv) {
         let out = {
           books
         }
-        res.render(appEnv.path + "/app/views/mybooks.pug", out);
+        res.render(appEnv.path + "/app/views/pages/books/mybooks.pug", out);
       });
     });
 
-  app.route('/books/all')
+  app.route('/books')
     .get(appEnv.middleware.isLoggedIn, (req, res, next) => {
       bookHandler.getAllUserBooks((err, books) => {
         if (err)
@@ -147,7 +147,7 @@ module.exports = function (app, appEnv) {
             let out = {
               books
             }
-            res.render(appEnv.path + "/app/views/allbooks.pug", out);
+            res.render(appEnv.path + "/app/views/pages/books/allbooks.pug", out);
           });
       });
     });

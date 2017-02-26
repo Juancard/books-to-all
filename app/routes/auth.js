@@ -13,7 +13,7 @@ module.exports = function (app, appEnv) {
         let out = {
           message: req.flash('loginMessage')
         };
-        res.render(appEnv.path + '/app/views/login.pug', out);
+        res.render(appEnv.path + '/app/views/pages/user/login.pug', out);
       })
       .post(appEnv.passport.authenticate('local-login', {
         successRedirect : '/',
@@ -25,7 +25,7 @@ module.exports = function (app, appEnv) {
         let out = {
           message: req.flash('signupMessage')
         };
-        res.render(appEnv.path + '/app/views/signup.pug', out);
+        res.render(appEnv.path + '/app/views/pages/user/signup.pug', out);
       })
       .post(appEnv.passport.authenticate('local-signup', {
             successRedirect: '/',

@@ -25,11 +25,11 @@ block html
       body
         .container-fluid
           block navbar
-            include navbar.pug
+            include ./components/navbar.pug
           .myContent
             block content
           block footer
-            include footer.pug
+            include ./components/footer.pug
         block js
           script(type='text/javascript', src='/common/ajax-functions.js')
           script(type='text/javascript', src='/common/helper.js')

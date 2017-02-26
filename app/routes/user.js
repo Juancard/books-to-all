@@ -22,7 +22,7 @@ module.exports = function (app, appEnv) {
         let out = {
           location: result
         };
-        res.render(appEnv.path + '/app/views/profile.pug', out);
+        res.render(appEnv.path + '/app/views/pages/user/profile.pug', out);
       })
 		});
 
