@@ -394,8 +394,8 @@ function bookHandler () {
     BookTrade.find({
       'requestedBy': user._id
     })
-    .populate("state")
     .populate('requestedBy')
+    .populate('state')
     .populate({
       path: "userBook",
       model: "UserBook",
@@ -410,6 +410,7 @@ function bookHandler () {
         model: 'Book'
       }]
     })
+    .sort({dateAdded: -1})
     .exec((err, userBooks) => {
       if (err) return callback(err);
       return callback(false, userBooks);
@@ -454,6 +455,7 @@ function bookHandler () {
             model: 'Book'
           }]
         })
+        .sort({dateAdded: -1})
         .exec((err, tradesRequestedTo) => {
           if (err) return callback(err);
           return callback(false, tradesRequestedTo);

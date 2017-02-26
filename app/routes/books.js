@@ -228,7 +228,7 @@ module.exports = function (app, appEnv) {
         res.json({
           results: userBookRemoved,
           message: {
-            type: 'success',
+            type: 'info',
             text: 'Succesfully removed ' + req.userBook.book.title
           }
         });
@@ -354,7 +354,7 @@ module.exports = function (app, appEnv) {
           res.json({
             results: tradeDenied,
             message: {
-              type: 'success',
+              type: 'info',
               text: 'Request denied!'
             }
           });

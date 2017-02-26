@@ -147,11 +147,6 @@
     elementClicked.disabled = true;
     let callback = (reload=false) => {
       elementClicked.disabled = false;
-      // SUPER GIANT HARDCODE HERE!!
-      // RELOADS PAGE, JUST TO NOT HAVE TO REFRESH
-      // EVERY ELEMENT WITH NEW state
-      // THIS IS WRONG AND SHOULD NEVER BE DONE
-      if (reload) window.location.reload();
     }
 
     if (clickedValue == 'remove')
@@ -244,9 +239,10 @@
     let url = urlBook + '/' + bookUserId + urlRequest + '/' + tradeId + urlCancel;
     ajaxFunctions.ajaxRequest('POST', url, null, ajaxFunctions.onDataReceived((err, canceled) => {
       if (canceled) {
-        console.log(canceled);
+        let tradeElement = document.getElementById(canceled._id);
+        changeTradeState(tradeElement, 'canceled');
       }
-      callback(true);
+      callback();
     }))
   }
 
@@ -259,9 +255,10 @@
     let url = urlBook + '/' + bookUserId + urlRequest + '/' + tradeId + urlFinish;
     ajaxFunctions.ajaxRequest('POST', url, null, ajaxFunctions.onDataReceived((err, finished) => {
       if (finished) {
-        console.log(finished);
+        let tradeElement = document.getElementById(finished._id);
+        changeTradeState(tradeElement, 'finished');
       }
-      callback(true);
+      callback();
     }))
   }
 
@@ -275,9 +272,10 @@
     let url = urlBook + '/' + bookUserId + urlRequest + '/' + tradeId + urlDeny;
     ajaxFunctions.ajaxRequest('POST', url, null, ajaxFunctions.onDataReceived((err, denied) => {
       if (denied) {
-        console.log(denied);
+        let tradeElement = document.getElementById(denied._id);
+        changeTradeState(tradeElement, 'denied');
       }
-      callback(true);
+      callback();
     }))
   }
 
@@ -290,9 +288,10 @@
     let url = urlBook + '/' + bookUserId + urlRequest + '/' + tradeId + urlAccept;
     ajaxFunctions.ajaxRequest('POST', url, null, ajaxFunctions.onDataReceived((err, accepted) => {
       if (accepted) {
-        console.log(accepted);
+        let tradeElement = document.getElementById(accepted._id);
+        changeTradeState(tradeElement, 'accepted');
       }
-      callback(true);
+      callback();
     }))
   }
 
@@ -300,9 +299,22 @@
 
 
   function changeState(element, state){
-    console.log("change element state", element, state);
     element.className = "btn btn-sm disabled btn-" + STATUS_COLOR[state];
     element.innerHTML = 'Trade is ' + helper.capitalizeFirstLetter(state);
-    console.log("new element: ", element);
+  }
+  function changeTradeState(tradeElement, state){
+    let colorState = STATUS_COLOR[state];
+    let stateText = helper.capitalizeFirstLetter(state);
+
+    tradeElement.className = "panel panel-" + colorState;
+
+    let statusHeader = tradeElement.getElementsByClassName('statusHeader')[0];
+    statusHeader.innerHTML = stateText;
+
+    let statusElement = tradeElement.getElementsByClassName('status')[0];
+    statusElement.className = "label label-" + colorState;
+    statusElement.innerHTML = stateText;
+
+    Array.from(tradeElement.getElementsByClassName('action')).forEach( e => e.outerHTML='')
   }
 })();
