@@ -15,59 +15,23 @@ block content
   .container
     h3 Books I requested
     hr
-    if (requester.length <= 0)
-      .jumbotron.jumbotron-fluid
-        h3.display-3.text-muted.text-center No trades yet.
-    else
-      .row
-        each trade in requester
-          - let tradeState = trade.state.state;
-          - let tradeBook = trade.userBook.book;
-          .tradeContainer.panel.col-md-4.col-sm-6(id=trade.id, class='panel-' + statusColor[tradeState])
-            .panel-heading.row #{trade.userBook.user.local.displayName} - #{tradeState}
-            .panel-body.row
-              .media.bookContainer(id=trade.userBook.id)
-                .media-left
-                  a(href=trade.userBook.book.imageUrl)
-                    img.media-object(src=trade.userBook.book.imageUrl, alt=trade.userBook.book.title)
-                .media-body
-                  h4.media-heading #{trade.userBook.book.title}
-                  p Owner: #{trade.userBook.user.local.displayName}
-                  p
-                    | Status:#{' '}
-                    span.label(class="label-" + statusColor[tradeState]) #{tradeState}
-                  if (trade.state.state == 'pending')
-                    button.action.btn.btn-sm.btn-warning(value="cancel") Cancel Request
-                  else if (trade.state.state == 'accepted')
-                    button.action.btn.btn-sm.btn-success(value="finish") Finish Trade
+    .row
+        if (requester.length <= 0)
+          .jumbotron.jumbotron-fluid
+            h3.display-3.text-muted.text-center No trades yet.
+        else
+          each trade in requester
+            include ../../components/trade.pug
 
     h3 Books requested to me
     hr
-    if (requested.length <= 0)
-      .jumbotron.jumbotron-fluid
-        h3.display-3.text-muted.text-center No trades yet.
-    else
-      .row
-        each trade in requested
-          - let tradeState = trade.state.state;
-          - let tradeBook = trade.userBook.book;
-          .tradeContainer.panel.col-md-4.col-sm-6(id=trade.id, class='panel-' + statusColor[tradeState])
-            .panel-heading.row #{trade.requestedBy.local.displayName} - #{tradeState}
-            .panel-body.row
-              .media.bookContainer(id=trade.userBook.id)
-                .media-left
-                  a(href=trade.userBook.book.imageUrl)
-                    img.media-object(src=trade.userBook.book.imageUrl, alt=trade.userBook.book.title)
-                .media-body
-                  h4.media-heading #{trade.userBook.book.title}
-                  p Requested By: #{trade.requestedBy.local.displayName}
-                  p
-                    | Status:#{' '}
-                    span.label(class="label-" + statusColor[tradeState]) #{tradeState}
-                  if (tradeState == 'pending')
-                    .btn-group
-                      button.action.btn.btn-sm.btn-primary(value="accept") Accept
-                      button.action.btn.btn-sm.btn-danger(value="deny") Deny
+    .row
+        if (requested.length <= 0)
+          .jumbotron.jumbotron-fluid
+            h3.display-3.text-muted.text-center No trades yet.
+        else
+          each trade in requested
+            include ../../components/trade.pug
 
 block append js
   script(type="text/javascript", src="/controllers/book.client.js")

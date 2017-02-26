@@ -395,6 +395,7 @@ function bookHandler () {
       'requestedBy': user._id
     })
     .populate("state")
+    .populate('requestedBy')
     .populate({
       path: "userBook",
       model: "UserBook",
@@ -445,6 +446,9 @@ function bookHandler () {
           populate: [{
             path: 'state',
             model: 'UserBookState'
+          }, {
+            path: 'user',
+            model: 'User'
           }, {
             path: 'book',
             model: 'Book'

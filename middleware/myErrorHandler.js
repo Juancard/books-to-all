@@ -10,6 +10,6 @@ module.exports = (err, req, res, next) => {
   if (req.xhr) {
     res.json(err)
   }else {
-    res.render(process.cwd() + '/app/views/error.pug', out);
+    res.render(process.cwd() + '/app/views/pages/error.pug', out);
   }
 }
