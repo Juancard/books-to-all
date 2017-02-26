@@ -290,6 +290,7 @@
       if (accepted) {
         let tradeElement = document.getElementById(accepted._id);
         changeTradeState(tradeElement, 'accepted');
+        changeTradeStateOnSameUserBooks(accepted.userBook, 'pending', 'denied');
       }
       callback();
     }))
@@ -316,5 +317,15 @@
     statusElement.innerHTML = stateText;
 
     Array.from(tradeElement.getElementsByClassName('action')).forEach( e => e.outerHTML='')
+  }
+  function changeTradeStateOnSameUserBooks(userBookId, fromState, toState){
+    let sameUserBookTrades = document.getElementsByClassName(userBookId);
+    Array.from(sameUserBookTrades).forEach(ub => {
+      let thisTradeState = ub.getElementsByTagName('SPAN')[0];
+      if (thisTradeState.innerHTML.toLowerCase() == fromState){
+        let thisTradeElement = helper.findAncestorByClass(ub, 'tradeContainer');
+        changeTradeState(thisTradeElement, toState);
+      }
+    });
   }
 })();
