@@ -34,7 +34,7 @@ block content
                   h4.media-heading #{trade.userBook.book.title}
                   p Owner: #{trade.userBook.user.local.displayName}
                   p
-                    | Status:
+                    | Status:#{' '}
                     span.label(class="label-" + statusColor[tradeState]) #{tradeState}
                   if (trade.state.state == 'pending')
                     button.action.btn.btn-sm.btn-warning(value="cancel") Cancel Request
@@ -62,7 +62,7 @@ block content
                   h4.media-heading #{trade.userBook.book.title}
                   p Requested By: #{trade.requestedBy.local.displayName}
                   p
-                    | Status:
+                    | Status:#{' '}
                     span.label(class="label-" + statusColor[tradeState]) #{tradeState}
                   if (tradeState == 'pending')
                     .btn-group

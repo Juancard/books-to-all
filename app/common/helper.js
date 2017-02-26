@@ -18,5 +18,8 @@ var helper = {
       !element.classList.contains(elementClass)
     );
     return element;
+  },
+  capitalizeFirstLetter: function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
   }
 }

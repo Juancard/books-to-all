@@ -22,6 +22,15 @@
   let urlAccept = "/accept";
   let urlDeny = "/deny";
 
+  const STATUS_COLOR = {
+    traded: 'default',
+    pending: 'info',
+    accepted: 'primary',
+    denied: 'danger',
+    canceled: 'warning',
+    finished: 'success'
+  };
+
   let formAddBook = document.forms['addBookForm'] || null;
 
   if (formAddBook) {
@@ -173,7 +182,7 @@
 
   //**************** REMOVE BOOK USER ***********************
   function onRemoveUserBook(bookUserId, callback){
-    console.log("on remove user book", bookUserId);
+    console.log("on remove user book");
     let url = urlBook + '/' + bookUserId + urlRemove;
     ajaxFunctions.ajaxRequest('DELETE', url,
       null, ajaxFunctions.onDataReceived(
@@ -191,7 +200,7 @@
   //**************** SET BOOK USER AVAILABLE OR NOT *************
 
   function onToggleRequestableUserBook(bookUserId, callback){
-    console.log("on toggle Requestable user book", bookUserId);
+    console.log("on toggle Requestable user book");
     let url = urlBook + '/' + bookUserId + urlToggle;
     ajaxFunctions.ajaxRequest('GET', url, null, ajaxFunctions.onDataReceived((err, toggled) => {
       if (toggled) {
@@ -214,14 +223,15 @@
   //******************* REQUEST BOOK USER **********************
 
   function onRequestUserBook(bookUserId, callback){
-    console.log("on request user book", bookUserId);
+    console.log("on request user book");
     let url = urlBook + '/' + bookUserId + urlRequest;
     ajaxFunctions.ajaxRequest('POST', url, null, ajaxFunctions.onDataReceived((err, requested) => {
       if (requested) {
-        let bookElement = document.getElementById(requested._id)
-
+        let bookElement = document.getElementById(requested.userBook._id);
+        let elementToReplace = bookElement.querySelectorAll('[value="request"]')[0];
+        changeState(elementToReplace, 'pending');
       }
-      callback(true);
+      callback();
     }))
   }
 
@@ -288,4 +298,11 @@
 
   //****************** END ACCEPT BOOK REQUEST ********************
 
+
+  function changeState(element, state){
+    console.log("change element state", element, state);
+    element.className = "btn btn-sm disabled btn-" + STATUS_COLOR[state];
+    element.innerHTML = 'Trade is ' + helper.capitalizeFirstLetter(state);
+    console.log("new element: ", element);
+  }
 })();
