@@ -1,49 +1,63 @@
 .books
   .row
-    - let statusColor = {traded: 'warning', pending: 'info', accepted: 'primary', denied: 'danger', canceled: 'warning', finished: 'success'}
+    - let statusColor = {traded: 'default', pending: 'info', accepted: 'primary', denied: 'danger', canceled: 'warning', finished: 'success'}
     each userBook in books
-      .col-xs-10.col-xs-offset-1.col-sm-offset-0.col-sm-3.col-md-2(id=userBook.id)
+      .bookContainer.col-xs-10.col-xs-offset-1.col-sm-offset-0.col-sm-3.col-md-2(id=userBook.id)
         .book(data-toggle='tooltip', title=userBook.book.title + " by "+ userBook.book.author)
           a(href=userBook.imageUrl || userBook.book.imageUrl)
             img.img-responsive(height="150", width="150", alt="book-"+userBook.book.title, src=userBook.imageUrl || userBook.book.imageUrl)
-        .bookAction
-          input.userBookId(type='hidden', value=userBook.id)
-          - let userBookState = userBook.state.state
-          if (userBook.user.equals(user._id))
-            if (userBookState  == "traded")
-              button.btn.btn-block.btn-sm.disabled(class="btn-"+ statusColor[userBookState])
-                |  Traded
-            else
-              button.btn.btn-block.btn-danger.btn-sm(value="remove") Remove
-              button.btn.btn-block.btn-warning.btn-sm(value="toggleRequestable")
-                if (userBookState  == "unavailable")
-                  | No trades accepted
-                else
-                  | Accepts trades
-          else
-            if (userBook.trades.length > 0)
-              - let tradeState = userBook.trades[0].state.state;
-              if (tradeState == 'pending')
-                button.btn.btn-block.btn-sm.disabled(class="btn-"+ statusColor[tradeState])
-                  |  Trade Pending
-              else if (tradeState == 'accepted')
-                button.btn.btn-block.btn-sm.disabled(class="btn-"+ statusColor[tradeState])
-                  |  Trade Accepted
-            else
-                if (userBookState  == "traded")
-                  button.btn.btn-block.btn-sm.disabled(class="btn-"+ statusColor[userBookState])
-                    |  Traded
-                else
-                  button.btn.btn-block.btn-primary.btn-sm(value="request")
-                    | Request
+        br
+        - let userBookState = userBook.state.state;
+        - let isOwner = userBook.user.equals(user._id);
+        - let isTraded = userBookState  == "traded";
+        - let isUnavailable = userBookState  == "unavailable";
+        - let userHasATrade = userBook.myTrade;
+
+        if (isOwner && !isTraded)
+          button.btn.btn-warning.btn-sm.dropdown-toggle(type='button', data-toggle='dropdown')
+            | Manage#{' '}
+            span.caret
+          ul.dropdown-menu(role='menu')
+            li
+              a.action(href='#', value='toggleRequestable')
+                |  Accepts trades:#{' '}
+                span.available #{(isUnavailable)? 'No' : 'Yes'}
+            li
+              a.action(href='#', value="remove") Remove
+
+        if (!(isOwner || isTraded || userHasATrade))
+          button.action.btn.btn-primary.btn-sm(value="request")
+            | Request
+
+        if (isTraded && (isOwner || !userHasATrade))
+          button.btn.btn-sm.disabled(class="btn-"+ statusColor[userBookState])
+            |  Traded
+
+        if (userHasATrade)
+          - let myTradeState = userBook.myTrade.state.state;
+          - let isPending = myTradeState == 'pending';
+          - let isAccepted = myTradeState == 'accepted';
+          if (isPending)
+            button.btn.btn-sm.disabled(class="btn-"+ statusColor[myTradeState])
+              |  Trade Pending
+          if (isAccepted)
+            button.btn.btn-sm.disabled(class="btn-"+ statusColor[myTradeState])
+              |  Trade Accepted
+
 
 
 #book-template(style='display: none')
-  .col-xs-10.col-xs-offset-1.col-sm-offset-0.col-sm-3.col-md-2
-    .book(data-toggle='tooltip', title='')
+  .bookContainer.col-xs-10.col-xs-offset-1.col-sm-offset-0.col-sm-3.col-md-2
+    .book
       a(href='')
         img.img-responsive(height="150", width="150", alt="", src='')
-    .bookAction
-      input.userBookId(type='hidden')
-      button.btn.btn-block.btn-danger.btn-sm(value="remove") Remove
-      button.btn.btn-block.btn-warning.btn-sm(value="toggleRequestable") Accepts trades
+    button.btn.btn-primary.btn-sm.dropdown-toggle(type='button', data-toggle='dropdown')
+      | Manage#{' '}
+      span.caret
+    ul.dropdown-menu(role='menu')
+      li
+        a.action(href='#', value="remove") Remove
+      li
+        a.action(href='#', value='toggleRequestable')
+          | Accepts trades:#{' '}
+          span.available Yes

@@ -135,14 +135,14 @@ module.exports = function (app, appEnv) {
                 )
               )
             for (let i=0; i<books.length; i++) {
-              books[i].trades = trades.filter(
+              books[i].myTrade = trades.filter(
                 (trade) => {
                   let tradeUserBookId = trade.userBook;
                   let tradeState = trade.state.state;
                   let isTradeFromThisBook = tradeUserBookId.equals(books[i]._id);
                   let isTradeOpen = tradeState == "accepted" || tradeState == 'pending';
                   return isTradeOpen && isTradeFromThisBook;
-                });
+                })[0];
             }
             let out = {
               books
@@ -203,7 +203,7 @@ module.exports = function (app, appEnv) {
             res.json({
               message: {
                 type: 'danger',
-                text: 'Book \"' + book.title + '\" is not aloud in our website.'
+                text: 'Book \"' + req.book.title + '\" is not aloud in our website.'
               }
             });
           console.log("Book is not inactive, let's add it to the user");
@@ -238,7 +238,7 @@ module.exports = function (app, appEnv) {
   app.route('/books/:userBook([a-fA-F0-9]{24})/toggleRequestable')
     .get(appEnv.middleware.isLoggedIn,
       appEnv.middleware.books.isOwner(true),
-      appEnv.middleware.books.isTraded(false),    
+      appEnv.middleware.books.isTraded(false),
       (req, res, next) => {
       console.log("in route toggle requestable to other users");
       bookHandler.toggleRequestable(req.userBook, (err, userBookToggled) => {

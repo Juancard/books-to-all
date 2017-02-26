@@ -3,8 +3,12 @@
 (function () {
 
   ajaxFunctions.ready(() => {
-    $('[data-toggle="tooltip"]').tooltip();
+    callTooltip();
   });
+
+  function callTooltip() {
+    $('[data-toggle="tooltip"]').tooltip();
+  }
 
   //**************** ADD BOOK ***********************
   let urlBook = appUrl + '/books';
@@ -76,7 +80,7 @@
     //**************** ADD BOOK ELEMENT ***********************
 
     const bookTemplate = document.getElementById('book-template').firstChild;
-    const bookContainer = document.getElementsByClassName('books')[0].firstChild;
+    const allBooksContainer = document.getElementsByClassName('books')[0].firstChild;
 
     function addBookElement(userBook){
       let toClear = document.getElementById('noBooks');
@@ -86,8 +90,10 @@
       newBookElement.id = userBook._id;
 
       let classBook = newBookElement.getElementsByClassName('book')[0];
-      //tooltip title, not book title
-      classBook.title = userBook.book.title + " by " + userBook.book.author;
+
+      let tooltipTitle = userBook.book.title + " by " + userBook.book.author;
+      classBook.setAttribute('data-toggle', 'tooltip');
+      classBook.setAttribute('title', tooltipTitle);
 
       let linkBook = classBook.getElementsByTagName('A')[0];
       linkBook.href = userBook.imageUrl || userBook.book.imageUrl;
@@ -96,12 +102,11 @@
       imageBook.alt = "book-" + userBook.book.title;
       imageBook.src = userBook.imageUrl || userBook.book.imageUrl;
 
-      let classBookAction = newBookElement.getElementsByClassName('bookAction')[0];
-      addBookAction(classBookAction);
-      let inputUserBookId = classBookAction.getElementsByClassName('userBookId')[0];
-      inputUserBookId.value = userBook._id;
+      let classesBookAction = newBookElement.getElementsByClassName('action');
+      Array.from(classesBookAction).forEach(addBookAction);
 
-      bookContainer.insertBefore(newBookElement, bookContainer.firstChild);
+      allBooksContainer.insertBefore(newBookElement, allBooksContainer.firstChild);
+      callTooltip();
     }
 
     //**************** END ADD BOOK ELEMENT ***********************
@@ -112,42 +117,49 @@
 
   //**************** ACTIONS FOR BOOK USER ***********************
 
-  let classesBookAction = document.getElementsByClassName('bookAction');
+  let classesBookAction = document.getElementsByClassName('action');
 
   let onBooksActionClick = e => {
-    if (e.target && e.target.nodeName === "BUTTON") {
-      let buttonClicked = e.target;
-      let userBookId = buttonClicked.parentElement.getElementsByClassName('userBookId')[0].value
-      let tradeId = buttonClicked.parentElement.getElementsByClassName('tradeId')
-      if (tradeId.length > 0) tradeId = tradeId[0].value;
-      let buttonValue = buttonClicked.value;
 
-      buttonClicked.disabled = true;
-      let callback = (reload=false) => {
-        buttonClicked.disabled = false;
-        // SUPER GIANT HARDCODE HERE!!
-        // RELOADS PAGE, JUST TO NOT HAVE TO REFRESH
-        // EVERY ELEMENT WITH NEW state
-        // THIS IS WRONG AND SHOULD NEVER BE DONE
-        if (reload) window.location.reload();
-      }
+    let elementClicked = e.target;
 
-      if (buttonValue == 'remove')
-        return onRemoveUserBook(userBookId, callback);
-      if (buttonValue == 'toggleRequestable')
-        return onToggleRequestableUserBook(userBookId, callback);
-      if (buttonValue == 'request')
-        return onRequestUserBook(userBookId, callback);
-      if (buttonValue == 'cancel')
-        return onCancelRequest(userBookId, tradeId, callback);
-      if (buttonValue == 'finish')
-        return onFinishTrade(userBookId, tradeId, callback);
-      if (buttonValue == 'deny')
-        return onDenyRequest(userBookId, tradeId, callback);
-      if (buttonValue == 'accept')
-        return onAcceptRequest(userBookId, tradeId, callback);
+    let bookContainer = helper.findAncestorByClass(elementClicked, 'bookContainer');
+    let userBookId;
+    if (bookContainer)
+      userBookId = bookContainer.id;
+
+    let tradeContainer = helper.findAncestorByClass(elementClicked, 'tradeContainer');
+    let tradeId;
+    if (tradeContainer)
+      tradeId = tradeContainer.id;
+
+    let clickedValue = elementClicked.getAttribute('value');
+
+    elementClicked.disabled = true;
+    let callback = (reload=false) => {
+      elementClicked.disabled = false;
+      // SUPER GIANT HARDCODE HERE!!
+      // RELOADS PAGE, JUST TO NOT HAVE TO REFRESH
+      // EVERY ELEMENT WITH NEW state
+      // THIS IS WRONG AND SHOULD NEVER BE DONE
+      if (reload) window.location.reload();
     }
-    e.stopPropagation();
+
+    if (clickedValue == 'remove')
+      return onRemoveUserBook(userBookId, callback);
+    if (clickedValue == 'toggleRequestable')
+      return onToggleRequestableUserBook(userBookId, callback);
+    if (clickedValue == 'request')
+      return onRequestUserBook(userBookId, callback);
+    if (clickedValue == 'cancel')
+      return onCancelRequest(userBookId, tradeId, callback);
+    if (clickedValue == 'finish')
+      return onFinishTrade(userBookId, tradeId, callback);
+    if (clickedValue == 'deny')
+      return onDenyRequest(userBookId, tradeId, callback);
+    if (clickedValue == 'accept')
+      return onAcceptRequest(userBookId, tradeId, callback);
+
   }
 
   let addBookAction = (classBookAction) => {
@@ -184,12 +196,12 @@
     ajaxFunctions.ajaxRequest('GET', url, null, ajaxFunctions.onDataReceived((err, toggled) => {
       if (toggled) {
         let bookElement = document.getElementById(toggled._id)
-        let buttons = bookElement.getElementsByClassName('bookAction')[0].getElementsByTagName('BUTTON');
-        for (let i=0; i<buttons.length; i++){
-          if (buttons[i].value == 'toggleRequestable'){
-            console.log(toggled);
+        let actionElements = bookElement.getElementsByClassName('action');
+        for (let i=0; i<actionElements.length; i++){
+          if (actionElements[i].getAttribute('value') == 'toggleRequestable'){
+            let span = actionElements[i].getElementsByTagName('SPAN')[0];
             //HARDCODE: SHOULD ASK FOR STATE STRING 'UNAVAILABLE', NOT STATE NUMBER 3
-            buttons[i].textContent = (toggled.state.state != 3)? "Accepts trades" : "No trades Accepted";
+            span.innerHTML = (toggled.state.state != 3)? "Yes" : "No";
           }
         }
       }
@@ -206,7 +218,8 @@
     let url = urlBook + '/' + bookUserId + urlRequest;
     ajaxFunctions.ajaxRequest('POST', url, null, ajaxFunctions.onDataReceived((err, requested) => {
       if (requested) {
-        console.log(requested);
+        let bookElement = document.getElementById(requested._id)
+
       }
       callback(true);
     }))

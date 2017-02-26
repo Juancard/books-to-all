@@ -11,5 +11,12 @@ var helper = {
     }
 
     $(div).animate({ left: 0},interval);
+  },
+  findAncestorByClass: function findAncestor (element, elementClass) {
+    while (
+      (element = element.parentElement) &&
+      !element.classList.contains(elementClass)
+    );
+    return element;
   }
 }

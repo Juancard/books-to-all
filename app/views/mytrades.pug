@@ -23,10 +23,10 @@ block content
         each trade in requester
           - let tradeState = trade.state.state;
           - let tradeBook = trade.userBook.book;
-          .panel.col-md-4.col-sm-6(class='panel-' + statusColor[tradeState])
+          .tradeContainer.panel.col-md-4.col-sm-6(id=trade.id, class='panel-' + statusColor[tradeState])
             .panel-heading.row #{trade.userBook.user.local.displayName} - #{tradeState}
             .panel-body.row
-              .media
+              .media.bookContainer(id=trade.userBook.id)
                 .media-left
                   a(href=trade.userBook.book.imageUrl)
                     img.media-object(src=trade.userBook.book.imageUrl, alt=trade.userBook.book.title)
@@ -36,13 +36,10 @@ block content
                   p
                     | Status:
                     span.label(class="label-" + statusColor[tradeState]) #{tradeState}
-                  .bookAction
-                    input.userBookId(type='hidden', value=trade.userBook.id)
-                    input.tradeId(type='hidden', value=trade.id)
-                    if (trade.state.state == 'pending')
-                      button.btn.btn-sm.btn-warning(value="cancel") Cancel Request
-                    else if (trade.state.state == 'accepted')
-                      button.btn.btn-sm.btn-success(value="finish") Finish Trade
+                  if (trade.state.state == 'pending')
+                    button.action.btn.btn-sm.btn-warning(value="cancel") Cancel Request
+                  else if (trade.state.state == 'accepted')
+                    button.action.btn.btn-sm.btn-success(value="finish") Finish Trade
 
     h3 Books requested to me
     hr
@@ -54,10 +51,10 @@ block content
         each trade in requested
           - let tradeState = trade.state.state;
           - let tradeBook = trade.userBook.book;
-          .panel.col-md-4.col-sm-6(class='panel-' + statusColor[tradeState])
+          .tradeContainer.panel.col-md-4.col-sm-6(id=trade.id, class='panel-' + statusColor[tradeState])
             .panel-heading.row #{trade.requestedBy.local.displayName} - #{tradeState}
             .panel-body.row
-              .media
+              .media.bookContainer(id=trade.userBook.id)
                 .media-left
                   a(href=trade.userBook.book.imageUrl)
                     img.media-object(src=trade.userBook.book.imageUrl, alt=trade.userBook.book.title)
@@ -68,11 +65,9 @@ block content
                     | Status:
                     span.label(class="label-" + statusColor[tradeState]) #{tradeState}
                   if (tradeState == 'pending')
-                    .btn-group.bookAction
-                      input.userBookId(type='hidden', value=trade.userBook.id)
-                      input.tradeId(type='hidden', value=trade.id)
-                      button.btn.btn-sm.btn-primary(value="accept") Accept
-                      button.btn.btn-sm.btn-danger(value="deny") Deny
+                    .btn-group
+                      button.action.btn.btn-sm.btn-primary(value="accept") Accept
+                      button.action.btn.btn-sm.btn-danger(value="deny") Deny
 
 block append js
   script(type="text/javascript", src="/controllers/book.client.js")
