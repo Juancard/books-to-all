@@ -41,6 +41,8 @@ This will install the books-to-all components into the `your-project` directory.
 Create a file named `.env` in the root directory. This file should contain:
 
 ```
+GOODREADS_KEY=your-client-id-here
+GOODREADS_SECRET=your-client-secret-here
 MONGO_URI=mongodb://localhost:27017/books-to-all
 NODE_ENV='development'
 PORT=8080
