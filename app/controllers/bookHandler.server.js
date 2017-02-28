@@ -220,38 +220,47 @@ function bookHandler () {
     this.findTradesByUserBook(userBook, (err, trades) => {
       if (err) return callback(err);
 
-      trades.forEach((trade) => {
-        if (trade.state.state == fromState){
-          this.setTradeStateTo(trade, toState, (err, trade, newState) => {
-            if (err)
-              return callback(
-                new http_verror.InternalError(
-                  err,
-                  "Fail on setting new trade's state",
-                  String(trade.id),
-                  toState
-                )
-              );
-            trade.save((err, tradeSaved) => {
+      let updateTradeState = (trade) => {
+        return new Promise(
+          (resolve, reject) => {
+            // Only update 'fromState' trades
+            if (trade.state.state != fromState)
+              // is not 'fromState', do nothing, just return
+              return resolve(trade);
+
+            this.setTradeStateTo(trade, toState, (err, trade, newState) => {
               if (err)
-                return callback(
+                return reject(
                   new http_verror.InternalError(
                     err,
-                    "Could not save trade %s after changing its state to %s",
+                    "Fail on setting new trade's state",
                     String(trade.id),
                     toState
                   )
                 );
-              //Trade saved succesfully
-              console.log("Trade saved succesfully: ", tradeSaved.id);
+              trade.save((err, tradeSaved) => {
+                if (err)
+                  return reject(
+                    new http_verror.InternalError(
+                      err,
+                      "Could not save trade %s after changing its state to %s",
+                      String(trade.id),
+                      toState
+                    )
+                  );
+                //Trade saved succesfully
+                resolve(tradeSaved);
+              });
             });
-          });
+          }
+        );
+      }
 
-          // end of if state==pending
-        }
-        // end of trade.forEach
-      });
-      callback(false, userBook);
+      let updatedTrades = trades.map(updateTradeState);
+      Promise.all(updatedTrades).then(
+        (trades) => callback(false, trades),
+        (error) => callback(error)
+      );
     });
   },
 
